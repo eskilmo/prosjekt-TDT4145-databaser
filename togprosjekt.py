@@ -1,5 +1,7 @@
 import sqlite3 as sq
 import re
+from datetime import date, datetime
+ 
 
 #Funksjon som tar inn en jernbanestasjon og en ukedag og viser alle tog som 
 #går innom denne stasjonen på denne dagen. 
@@ -160,11 +162,11 @@ def buy_tickets():
         ordreNR = len(rows) + 1
     
     cursor.execute('''INSERT INTO Bestilling VALUES (?, ?)''', (kundeNR, ordreNR))
-    AntallBilletter = input("Hvor mange billetter vil du kjøpe?")
+    antallBilletter = input("Hvor mange billetter vil du kjøpe?")
     if AntallBilletter > ledigeBilletter:
         raise Exception("Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen.")
-    Bestillingsdato = 
-    Bestillingstid = 
+    bestillingsdato = date.today().strftime("%m/%d/%Y")
+    bestillingstid = 
 
 
 
