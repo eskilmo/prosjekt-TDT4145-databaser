@@ -123,6 +123,7 @@ def registrate_customer():
     con.close()
 
 #kilde: https://stackoverflow.com/questions/19859282/check-if-a-string-contains-a-number
+#Hjelpemetode for å sjekke om det er tall i navnet
 def has_numbers(inputString):
     return any(char.isdigit() for char in inputString)
 
@@ -135,7 +136,39 @@ def valid_customer(navn,epost):
     for row in rows:
         if row[3]==navn and row[2]==epost:
             return True
+    con.close()
     return False
+
+def buy_tickets():
+    print("Login for å få kjøpt billetter:")
+    navn = input("Navn: ")
+    epost = input("Epost: ")
+    if valid_customer(navn, epost) == False:
+            raise Exception("Du har ikke registrert deg i kunderegisteret.")
+    #få metode for å få inn alle e finne ledige billetter for en oppgitt strekning 
+    #på en ønsket togrute og kjøpe de billettene hen ønsker
+    #ledigeBilletter=
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute("SELECT kundNR FROM Kunde WHERE navn = ? AND epost = ?", (navn, epost))
+    kundeNR = cursor.fetchone()[0]
+    cursor.execute("SELECT * FROM Kundeordre")
+    rows = cursor.fetchall()
+    if rows == None:
+        ordreNR = 1
+    else:
+        ordreNR = len(rows) + 1
+    
+    cursor.execute('''INSERT INTO Bestilling VALUES (?, ?)''', (kundeNR, ordreNR))
+    AntallBilletter = input("Hvor mange billetter vil du kjøpe?")
+    if AntallBilletter > ledigeBilletter:
+        raise Exception("Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen.")
+    Bestillingsdato = 
+    Bestillingstid = 
+
+
+
+
 
 
 
