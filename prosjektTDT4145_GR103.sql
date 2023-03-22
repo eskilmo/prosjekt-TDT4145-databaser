@@ -72,6 +72,7 @@ CREATE table Togrutetabell (
     jernbanestasjonsnavn VARCHAR(40) NOT NULL,
     ankomsttid VARCHAR(10),
     avgangstid VARCHAR(10),
+    StasjonNR INTEGER,
     CONSTRAINT togrutetabell_PK PRIMARY KEY (togruteID, jernbanestasjonsnavn),
     CONSTRAINT togrutetabell_FK1 FOREIGN KEY (togruteID) REFERENCES Togrute(ruteID) ON UPDATE CASCADE ON DELETE CASCADE,
     CONSTRAINT togrutetabell_FK2 FOREIGN KEY (jernbanestasjonsnavn) REFERENCES Jernbanestasjon(navn) ON UPDATE CASCADE ON DELETE CASCADE);
