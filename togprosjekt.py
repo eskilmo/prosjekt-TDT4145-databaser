@@ -5,27 +5,6 @@ from datetime import date, datetime
 
 #Funksjon som tar inn en jernbanestasjon og en ukedag og viser alle tog som 
 #går innom denne stasjonen på denne dagen. 
-def hentTogruterUkedagStasjon(stasjon, ukedag):
-    con = sq.connect('prosjekt.db')
-    cursor = con.cursor()
-    cursor.execute('''SELECT * FROM
-        (SELECT ruteID, startstasjon, endestasjon, hovedretning, operatør FROM
-        (SELECT togruteID
-        FROM Togrutetabell
-        WHERE jernbanestasjonsnavn=?)
-        INNER JOIN Togrute ON togruteID=ruteID)
-        NATURAL JOIN Avgangsdager
-        WHERE dag=?''', (stasjon, ukedag))
-    rows = cursor.fetchall()
-    print(f"Togruter som går innom {stasjon} på {ukedag}:")
-    for row in rows:
-        print(row)
-    con.close()
-
-#hentTogruterUkedagStasjon("Bodø", "mandag")
-
-#Funksjon som tar inn ønsket start- og sluttstasjon med dato og tid for en reise,
-#og viser alle togreiser som går mellom stasjonene etter dette tidspunktet. 
 def hentTogreise(startstasjon, sluttstasjon, dato, tid):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
@@ -44,7 +23,7 @@ def hentTogreise(startstasjon, sluttstasjon, dato, tid):
         cursor.execute('''SELECT * FROM Togrutetabell
         WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, startstasjon))
         rows2 = cursor.fetchall()
-        print(rows2[0])
+        #print(rows2[0])
         if rows2[0][2]==None:
             starttidspunkt=rows2[0][3]
         else: 
@@ -58,16 +37,35 @@ def hentTogreise(startstasjon, sluttstasjon, dato, tid):
         else:
             slutttidspunkt=rows2[0][2]
 
-        if not tid1_før_tid2(starttidspunkt, slutttidspunkt):
+        if tid1_før_tid2(slutttidspunkt, starttidspunkt):
             continue
-            # raise Exception("feil")
         else:
             gyldigeTogruteIDer.append(togruteID)
-            print("TOGRUTE SOM KJØRER:", togruteID)
-        
-    #for ruteID in gyldigeTogruteIDer:
-
+            #print("TOGRUTE SOM KJØRER:", togruteID)
     
+    tekst=""
+    first=True
+    for ruteID in gyldigeTogruteIDer:
+        if first:
+            tekst+=f"ruteID={ruteID}"
+            first=False
+        else:
+            tekst+=f" OR ruteID={ruteID}"
+                                
+    #Togreiser som går fra startstasjon til sluttstasjon etter gitt dato og klokkeslett: 
+    cursor.execute(f'''SELECT ruteID, togreiseID, dato, jernbanestasjonsnavn AS startstasjon, avgangstid FROM Togrute
+                        INNER JOIN Togreise ON ruteID=Togreise.togruteID
+                        INNER JOIN Togrutetabell ON ruteID=Togrutetabell.togruteID
+                        WHERE ({tekst}) AND jernbanestasjonsnavn=?
+                        ORDER BY dato, avgangstid''', (startstasjon,))
+    rows3 = cursor.fetchall()
+    for row in rows3:
+        datoPaaTogreise=row[2]
+        tidPaaTogreise=row[4]
+        if dato1_før_dato2(dato, datoPaaTogreise):
+            print("TogruteID:", row[0], "TogreiseID:", row[1], "Dato:", row[2], "Kl:", row[4])
+        elif (dato==datoPaaTogreise) and tid1_før_tid2(tid, tidPaaTogreise):
+            print("TogruteID:", row[0], "TogreiseID:", row[1], "Dato:", row[2], "Kl:", row[4])
 
     con.close()
 
@@ -84,6 +82,26 @@ def tid1_før_tid2(tid1, tid2):
     if timer1 > timer2:
         return False
     elif timer1==timer2 and minutter1 > minutter2:
+        return False
+    return True
+
+#Hjelpefunksjon, sjekker om dato1 er før dato2
+def dato1_før_dato2(dato1, dato2):
+    if dato1==dato2:
+        return False
+    tid_liste1 = dato1.split('.')
+    d1 = int(tid_liste1[0])
+    m1 = int(tid_liste1[1])
+    y1 = int(tid_liste1[2])
+    tid_liste2 = dato2.split('.')
+    d2 = int(tid_liste2[0])
+    m2 = int(tid_liste2[1])
+    y2 = int(tid_liste2[2])
+    if y1 > y2:
+        return False
+    elif y1==y2 and m1 > m2:
+        return False
+    elif y1==y2 and m1==m2 and d1>d2:
         return False
     return True
 
