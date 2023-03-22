@@ -110,24 +110,24 @@ INSERT INTO SengIVogn (vognID, sengNR) VALUES (2, 6);
 INSERT INTO SengIVogn (vognID, sengNR) VALUES (2, 7);
 INSERT INTO SengIVogn (vognID, sengNR) VALUES (2, 8);
 
-INSERT INTO Togrutetabell VALUES (1, "Trondheim", NULL, "07:49");
-INSERT INTO Togrutetabell VALUES (1, "Steinkjer", NULL, "09:51");
-INSERT INTO Togrutetabell VALUES (1, "Mosjøen", NULL, "13:20");
-INSERT INTO Togrutetabell VALUES (1, "Mo i Rana", NULL, "14:31");
-INSERT INTO Togrutetabell VALUES (1, "Fauske", NULL, "16:49");
-INSERT INTO Togrutetabell VALUES (1, "Bodø", "17:34", NULL);
+INSERT INTO Togrutetabell VALUES (1, "Trondheim", NULL, "07:49", 1);
+INSERT INTO Togrutetabell VALUES (1, "Steinkjer", NULL, "09:51", 2);
+INSERT INTO Togrutetabell VALUES (1, "Mosjøen", NULL, "13:20", 3);
+INSERT INTO Togrutetabell VALUES (1, "Mo i Rana", NULL, "14:31", 4);
+INSERT INTO Togrutetabell VALUES (1, "Fauske", NULL, "16:49", 5);
+INSERT INTO Togrutetabell VALUES (1, "Bodø", "17:34", NULL, 6);
 
-INSERT INTO Togrutetabell VALUES (2, "Trondheim", NULL, "23:05");
-INSERT INTO Togrutetabell VALUES (2, "Steinkjer", NULL, "00:57");
-INSERT INTO Togrutetabell VALUES (2, "Mosjøen", NULL, "04:41");
-INSERT INTO Togrutetabell VALUES (2, "Mo i Rana", NULL, "05:55");
-INSERT INTO Togrutetabell VALUES (2, "Fauske", NULL, "08:19");
-INSERT INTO Togrutetabell VALUES (2, "Bodø", "09:05", NULL);
+INSERT INTO Togrutetabell VALUES (2, "Trondheim", NULL, "23:05", 1);
+INSERT INTO Togrutetabell VALUES (2, "Steinkjer", NULL, "00:57", 2);
+INSERT INTO Togrutetabell VALUES (2, "Mosjøen", NULL, "04:41", 3);
+INSERT INTO Togrutetabell VALUES (2, "Mo i Rana", NULL, "05:55", 4);
+INSERT INTO Togrutetabell VALUES (2, "Fauske", NULL, "08:19", 5);
+INSERT INTO Togrutetabell VALUES (2, "Bodø", "09:05", NULL, 6);
 
-INSERT INTO Togrutetabell VALUES (3, "Mo i Rana", NULL, "08:11");
-INSERT INTO Togrutetabell VALUES (3, "Mosjøen", NULL, "09:14");
-INSERT INTO Togrutetabell VALUES (3, "Steinkjer", NULL, "12:31");
-INSERT INTO Togrutetabell VALUES (3, "Trondheim", "14:13", NULL);
+INSERT INTO Togrutetabell VALUES (3, "Mo i Rana", NULL, "08:11", 1);
+INSERT INTO Togrutetabell VALUES (3, "Mosjøen", NULL, "09:14", 2);
+INSERT INTO Togrutetabell VALUES (3, "Steinkjer", NULL, "12:31", 3);
+INSERT INTO Togrutetabell VALUES (3, "Trondheim", "14:13", NULL, 4);
 
 INSERT INTO RuteOperatør VALUES (1, "SJ");
 INSERT INTO RuteOperatør VALUES (2, "SJ");
