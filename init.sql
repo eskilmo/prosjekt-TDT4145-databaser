@@ -25,6 +25,23 @@ INSERT INTO Togrute (ruteID, startstasjon, endestasjon, hovedretning, operatør)
 INSERT INTO Togrute VALUES (2, "Trondheim", "Bodø", "med", "SJ");
 INSERT INTO Togrute VALUES (3, "Mo i Rana", "Trondheim", "mot", "SJ");
 
+INSERT INTO DelstrekningPåTogrute VALUES (1, 1);
+INSERT INTO DelstrekningPåTogrute VALUES (1, 2);
+INSERT INTO DelstrekningPåTogrute VALUES (1, 3);
+INSERT INTO DelstrekningPåTogrute VALUES (1, 4);
+INSERT INTO DelstrekningPåTogrute VALUES (1, 5);
+
+INSERT INTO DelstrekningPåTogrute VALUES (2, 1);
+INSERT INTO DelstrekningPåTogrute VALUES (2, 2);
+INSERT INTO DelstrekningPåTogrute VALUES (2, 3);
+INSERT INTO DelstrekningPåTogrute VALUES (2, 4);
+INSERT INTO DelstrekningPåTogrute VALUES (2, 5);
+
+INSERT INTO DelstrekningPåTogrute VALUES (3, 1);
+INSERT INTO DelstrekningPåTogrute VALUES (3, 2);
+INSERT INTO DelstrekningPåTogrute VALUES (3, 3);
+
+
 INSERT INTO Togreise VALUES (1, 1, "03.04.2023");
 INSERT INTO Togreise VALUES (2, 2, "03.04.2023");
 INSERT INTO Togreise VALUES (3, 3, "03.04.2023");
