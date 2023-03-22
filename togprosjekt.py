@@ -178,7 +178,7 @@ def valid_customer(navn,epost):
             return True
     con.close()
     return False
-
+#g) 
 def buy_tickets():
     print("Login for å få kjøpt billetter:")
     navn = input("Navn: ")
@@ -222,7 +222,8 @@ def buy_tickets():
     cursor.execute('''INSERT INTO BillettKjøp VALUES (?, ?)''', (billettID, ordreNR))
     #husk å legge til rett variabelnavn
     cursor.execute('''INSERT INTO Billett VALUES (?, ?, ?, ?)''', (billettID, startstasjon, sluttstasjon, avgangsdato))
-    
+    #når billettkjøpet har blitt registrert må de aktuelle setene/sengene bli gjort om til 
+    # å ikke være ledig lengre 
 
     
 
