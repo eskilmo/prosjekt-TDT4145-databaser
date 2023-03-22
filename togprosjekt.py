@@ -1,6 +1,7 @@
 import sqlite3 as sq
 
-#oppgave c)
+#Funksjon som tar inn en jernbanestasjon og en ukedag og viser alle tog som 
+#går innom denne stasjonen på denne dagen. 
 def hentTogruterUkedagStasjon(stasjon, ukedag):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
@@ -19,7 +20,55 @@ def hentTogruterUkedagStasjon(stasjon, ukedag):
     con.close()
 
 #hentTogruterUkedagStasjon("Bodø", "mandag")
-#Hjelpefunksjon
+
+#Funksjon som tar inn ønsket start- og sluttstasjon med dato og tid for en reise,
+#og viser alle togreiser som går mellom stasjonene etter dette tidspunktet. 
+def hentTogreise(startstasjon, sluttstasjon, dato, tid):
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute('''SELECT togruteID FROM Togrutetabell
+        WHERE jernbanestasjonsnavn=? or jernbanestasjonsnavn=?
+        GROUP BY togruteID
+        HAVING count(jernbanestasjonsnavn)=2''', (startstasjon, sluttstasjon))
+    rows = cursor.fetchall()
+    print(f"Togruter som går fra {startstasjon} til {sluttstasjon}:")
+
+    #Finner og lagrer alle togreiser som kjører mellom start og slutt. 
+    gyldigeTogruteIDer=[]
+    for row in rows:
+        togruteID = row[0]
+        
+        cursor.execute('''SELECT * FROM Togrutetabell
+        WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, startstasjon))
+        rows2 = cursor.fetchall()
+        print(rows2[0])
+        if rows2[0][2]==None:
+            starttidspunkt=rows2[0][3]
+        else: 
+            starttidspunkt=rows2[0][2]
+
+        cursor.execute('''SELECT * FROM Togrutetabell
+        WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, sluttstasjon))
+        rows2 = cursor.fetchall()
+        if rows2[0][2]==None:
+            slutttidspunkt=rows2[0][3]
+        else:
+            slutttidspunkt=rows2[0][2]
+
+        if not tid1_før_tid2(starttidspunkt, slutttidspunkt):
+            continue
+            # raise Exception("feil")
+        else:
+            gyldigeTogruteIDer.append(togruteID)
+            print("TOGRUTE SOM KJØRER:", togruteID)
+        
+    #for ruteID in gyldigeTogruteIDer:
+
+    
+
+    con.close()
+
+#Hjelpefunksjon, sjekker om klokkeslett hh:mm er før klokkeslett hh:mm
 def tid1_før_tid2(tid1, tid2):
     if tid1 == tid2:
         return True
@@ -35,49 +84,4 @@ def tid1_før_tid2(tid1, tid2):
         return False
     return True
 
-def hentTogreise(startstasjon, sluttstasjon, dato, tid):
-    con = sq.connect('prosjekt.db')
-    cursor = con.cursor()
-    cursor.execute('''SELECT togruteID FROM Togrutetabell
-        WHERE jernbanestasjonsnavn=? or jernbanestasjonsnavn=?
-        GROUP BY togruteID
-        HAVING count(jernbanestasjonsnavn)=2''', (startstasjon, sluttstasjon))
-    rows = cursor.fetchall()
-    print(f"Togruter som går fra {startstasjon} til {sluttstasjon}:")
-
-
-    gyldigeTogruteIDer=[]
-    for row in rows:
-        togruteID = row[0]
-        
-        cursor.execute('''SELECT * FROM Togrutetabell
-        WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, startstasjon))
-        rows2 = cursor.fetchall()
-        if rows2[0][2] == None:
-            starttidspunkt=rows2[0][3]
-        else: 
-            starttidspunkt=rows2[0][2]
-            
-        cursor.execute('''SELECT * FROM Togrutetabell
-        WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, sluttstasjon))
-        rows2 = cursor.fetchall()
-        if rows2[0][2] == None: 
-            slutttidspunkt=rows2[0][3]
-        else: 
-            slutttidspunkt=rows2[0][2]
-
-        if not tid1_før_tid2(starttidspunkt, slutttidspunkt):
-            raise Exception("feil")
-        else:
-            gyldigeTogruteIDer.append(togruteID)
-            print("TOGRUTE SOM KJØRER:", togruteID)
-        
-    #for ruteID in gyldigeTogruteIDer:
-
-    
-
-    con.close()
-
-
-
-hentTogreise("Trondheim", "Bodø", "03.04.2023", "00:00")
+hentTogreise("Trondheim", "Fauske", "03.04.2023", "00:00")
