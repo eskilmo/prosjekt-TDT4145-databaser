@@ -10,7 +10,9 @@
 # INSERT INTO SeteLedigPåDelstrekning (togreiseID, DelstrekningsID, vognID, seteNR, ledig) VALUES ()
 
 for i in range(1,7):
-    for j in range():
-        if (i == 3 or i == 6):
-            break
-        print(f'''INSERT INTO SeteLedigPåDelstrekning (togreiseID, DelstrekningsID, vognID, seteNR, ledig) VALUES ({i}, {j}, {}, {}, {True})''')
+    if (i == 3 or i == 6):
+        for x in range(1,4):
+            print(f'''INSERT INTO SeteLedigPåDelstrekning (togreiseID, DelstrekningsID, vognID, seteNR, ledig) VALUES ({i}, {x}, {1}, {1}, {True})''')
+    else:
+        for j in range(1,6):
+            print(f'''INSERT INTO SeteLedigPåDelstrekning (togreiseID, DelstrekningsID, vognID, seteNR, ledig) VALUES ({i}, {j}, {1}, {1}, {True})''')
