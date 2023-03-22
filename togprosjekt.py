@@ -184,7 +184,14 @@ def buy_tickets():
     if antallBilletter > ledigeBilletter:
         raise Exception("Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er ")
     bestillingsdato = date.today().strftime("%d/%m/%Y")
-    bestillingstid = datetime.now().hour + ":" + datetime.now().minute
+    feilbestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
+    splittet = bestillingsdato.split("/")
+    bestillingstid = ""
+    for element in splittet:
+        if len(element) > 2:
+            bestillingstid += element
+        else:
+            bestillingstid += element + "."
 
 
 
