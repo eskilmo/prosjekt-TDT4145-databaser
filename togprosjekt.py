@@ -203,15 +203,28 @@ def buy_tickets():
     antallBilletter = input("Hvor mange billetter vil du kjøpe?")
     if antallBilletter > ledigeBilletter:
         raise Exception("Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er ")
-    bestillingsdato = date.today().strftime("%d/%m/%Y")
+    bestillingsDato = date.today().strftime("%d/%m/%Y")
     feilbestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
-    splittet = bestillingsdato.split("/")
-    bestillingstid = ""
+    splittet = bestillingsDato.split("/")
+    bestillingsTid = ""
     for element in splittet:
         if len(element) > 2:
-            bestillingstid += element
+            bestillingsTid += element
         else:
-            bestillingstid += element + "."
+            bestillingsTid += element + "."
+    cursor.execute('''INSERT INTO Kundeordre VALUES (?, ?, ?, ?)''', (antallBilletter, ordreNR, bestillingsDato, bestillingsTid))
+    cursor.execute("SELECT * FROM BillettKjøp")
+    rows = cursor.fetchall()
+    if rows == None:
+        billettID = 1
+    else:
+        billettID = len(rows) + 1
+    cursor.execute('''INSERT INTO BillettKjøp VALUES (?, ?)''', (billettID, ordreNR))
+    #husk å legge til rett variabelnavn
+    cursor.execute('''INSERT INTO Billett VALUES (?, ?, ?, ?)''', (billettID, startstasjon, sluttstasjon, avgangsdato))
+    
+
+    
 
 
 
