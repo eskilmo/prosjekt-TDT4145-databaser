@@ -638,3 +638,22 @@ INSERT INTO SeteLedigPåDelstrekning (togreiseID, DelstrekningsID, vognID, seteN
 INSERT INTO SeteLedigPåDelstrekning (togreiseID, DelstrekningsID, vognID, seteNR, ledig) VALUES (6, 3, 5, 10, True);
 INSERT INTO SeteLedigPåDelstrekning (togreiseID, DelstrekningsID, vognID, seteNR, ledig) VALUES (6, 3, 5, 11, True);
 INSERT INTO SeteLedigPåDelstrekning (togreiseID, DelstrekningsID, vognID, seteNR, ledig) VALUES (6, 3, 5, 12, True);
+
+--Legge inn senger
+
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (2, 2, 1, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (2, 2, 2, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (2, 2, 3, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (2, 2, 4, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (2, 2, 5, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (2, 2, 6, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (2, 2, 7, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (2, 2, 8, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (5, 2, 1, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (5, 2, 2, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (5, 2, 3, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (5, 2, 4, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (5, 2, 5, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (5, 2, 6, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (5, 2, 7, True);
+INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES (5, 2, 8, True);
