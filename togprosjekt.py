@@ -163,10 +163,13 @@ def buy_tickets():
     
     cursor.execute('''INSERT INTO Bestilling VALUES (?, ?)''', (kundeNR, ordreNR))
     antallBilletter = input("Hvor mange billetter vil du kjøpe?")
-    if AntallBilletter > ledigeBilletter:
-        raise Exception("Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen.")
-    bestillingsdato = date.today().strftime("%m/%d/%Y")
-    bestillingstid = 
+    if antallBilletter > ledigeBilletter:
+        raise Exception("Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er ")
+    bestillingsdato = date.today().strftime("%d/%m/%Y")
+    bestillingstid = datetime.now().hour + ":" + datetime.now().minute
+
+
+
 
 
 
