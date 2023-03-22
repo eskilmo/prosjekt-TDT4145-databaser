@@ -40,6 +40,14 @@ CREATE table Togrute (
     CONSTRAINT togrute_FK2 FOREIGN KEY (endestasjon) REFERENCES Jernbanestasjon(navn) ON UPDATE CASCADE ON DELETE NO ACTION,
     CONSTRAINT togrute_FK3 FOREIGN KEY (operatør) REFERENCES Operatør(navn) ON UPDATE CASCADE ON DELETE CASCADE);
 
+CREATE table DelstrekningPåTogrute (
+    ruteID INTEGER NOT NULL,
+    delstrekningsID INTEGER NOT NULL,
+    CONSTRAINT delstrekningpåtogrute_PK PRIMARY KEY (ruteID, delstrekningsID), 
+    CONSTRAINT delstrekningpåtogrute_FK1 FOREIGN KEY (ruteID) REFERENCES Togrute(ruteID) ON UPDATE CASCADE ON DELETE NO ACTION, 
+    CONSTRAINT delstrekningpåtogrute_FK2 FOREIGN KEY (delstrekningsID) REFERENCES Delstrekning(delstrekningsID) ON UPDATE CASCADE ON DELETE NO ACTION);
+
+
 CREATE table Togreise (
 	togreiseID INTEGER NOT NULL,
     togruteID INTEGER NOT NULL, 
