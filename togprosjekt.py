@@ -126,3 +126,16 @@ def registrate_customer():
 def has_numbers(inputString):
     return any(char.isdigit() for char in inputString)
 
+#Hjelpemetode til g) for å sjekke om kunden er registrert før billettkjøp
+def valid_customer(navn,epost):
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute("SELECT * FROM Kunde")
+    rows = cursor.fetchall()
+    for row in rows:
+        if row[3]==navn and row[2]==epost:
+            return True
+    return False
+
+
+
