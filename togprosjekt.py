@@ -1,4 +1,5 @@
 import sqlite3 as sq
+import re
 
 #Funksjon som tar inn en jernbanestasjon og en ukedag og viser alle tog som 
 #går innom denne stasjonen på denne dagen. 
@@ -85,3 +86,43 @@ def tid1_før_tid2(tid1, tid2):
     return True
 
 hentTogreise("Trondheim", "Fauske", "03.04.2023", "00:00")
+
+
+#e) En bruker skal kunne registrere seg i kunderegisteret
+
+def registrate_customer():
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute("SELECT * FROM Kunde")
+    rows = cursor.fetchall()
+    if rows == None:
+        kundenummer = 1
+    else:
+        kundenummer = len(rows) + 1
+    navn = str(input("Navn: "))
+
+    if len(navn)>40 or has_numbers(navn):
+        raise Exception("Ugyldig navn.")
+    
+    pattern = re.compile("[^@]+@[^@]+\.[^@]+")
+    epost = str(input("E-post: "))
+    if len(epost)>50 or not pattern.match(epost):
+        raise Exception("Ugyldig e-post.")
+    
+    tlf = str(input("Tlf nummer: "))
+    if (len(tlf)!=8 or not tlf.isnumeric()):
+        raise Exception("Ugyldig nummer.")
+    
+    cursor.execute("SELECT * FROM Kunde WHERE mobilNR = ? OR epost = ?", (tlf, epost))
+    duplicates = cursor.fetchall()
+    if duplicates != []:
+        raise Exception("Tlf eller epost er allerede registrert i kunderegisteret.")
+    
+    cursor.execute("INSERT INTO Kunde (kundeNR, mobilNR, epost, navn) VALUES ( ?, ?, ?, ?)", (kundenummer, tlf, epost, navn))
+    con.commit()
+    con.close()
+
+#kilde: https://stackoverflow.com/questions/19859282/check-if-a-string-contains-a-number
+def has_numbers(inputString):
+    return any(char.isdigit() for char in inputString)
+
