@@ -19,7 +19,7 @@ INSERT INTO BestårAv (banestrekningsnavn, delstrekningsID) VALUES ("Nordlandsba
 INSERT INTO BestårAv (banestrekningsnavn, delstrekningsID) VALUES ("Nordlandsbanen", 4);
 INSERT INTO BestårAv (banestrekningsnavn, delstrekningsID) VALUES ("Nordlandsbanen", 5);
 
-INSERT INTO operatør (antallVogner, navn) VALUES (5, "SJ");
+INSERT INTO Operatør (antallVogner, navn) VALUES (5, "SJ");
 
 INSERT INTO Togrute (ruteID, startstasjon, endestasjon, hovedretning, operatør) VALUES (1, "Trondheim", "Bodø", "med", "SJ");
 INSERT INTO Togrute VALUES (2, "Trondheim", "Bodø", "med", "SJ");
