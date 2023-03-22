@@ -1,3 +1,0 @@
-#liker ikke feil
-
-
