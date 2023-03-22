@@ -1,9 +1,29 @@
 import sqlite3 as sq
 import re
 from datetime import date, datetime
- 
 
-#Funksjon som tar inn en jernbanestasjon og en ukedag og viser alle tog som 
+#c) Funksjon som tar inn en jernbanestasjon og en ukedag og viser alle tog som 
+#går innom denne stasjonen på denne dagen. 
+def hentTogruterUkedagStasjon(stasjon, ukedag):
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute('''SELECT * FROM
+        (SELECT ruteID, startstasjon, endestasjon, hovedretning, operatør FROM
+        (SELECT togruteID
+        FROM Togrutetabell
+        WHERE jernbanestasjonsnavn=?)
+        INNER JOIN Togrute ON togruteID=ruteID)
+        NATURAL JOIN Avgangsdager
+        WHERE dag=?''', (stasjon, ukedag))
+    rows = cursor.fetchall()
+    print(f"Togruter som går innom {stasjon} på {ukedag}:")
+    for row in rows:
+        print(row)
+    con.close()
+
+#hentTogruterUkedagStasjon("Bodø", "mandag")
+
+#d) Funksjon som tar inn en jernbanestasjon og en ukedag og viser alle tog som 
 #går innom denne stasjonen på denne dagen. 
 def hentTogreise(startstasjon, sluttstasjon, dato, tid):
     con = sq.connect('prosjekt.db')
@@ -13,7 +33,7 @@ def hentTogreise(startstasjon, sluttstasjon, dato, tid):
         GROUP BY togruteID
         HAVING count(jernbanestasjonsnavn)=2''', (startstasjon, sluttstasjon))
     rows = cursor.fetchall()
-    print(f"Togruter som går fra {startstasjon} til {sluttstasjon}:")
+    print(f"Togruter som går fra {startstasjon} til {sluttstasjon} etter {dato} kl {tid}:")
 
     #Finner og lagrer alle togreiser som kjører mellom start og slutt. 
     gyldigeTogruteIDer=[]
