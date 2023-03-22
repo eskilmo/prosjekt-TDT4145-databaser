@@ -35,34 +35,32 @@ def hentTogreise(startstasjon, sluttstasjon, dato, tid):
     rows = cursor.fetchall()
     print(f"Togruter som går fra {startstasjon} til {sluttstasjon} etter {dato} kl {tid}:")
 
-    #Finner og lagrer alle togreiser som kjører mellom start og slutt. 
+    #Finner og lagrer alle togreiser som kjører mellom start og slutt (må sjekke om de går riktig vei). 
     gyldigeTogruteIDer=[]
     for row in rows:
         togruteID = row[0]
         
+        #Spørring for å finne startstasjon sitt StasjonNr
         cursor.execute('''SELECT * FROM Togrutetabell
         WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, startstasjon))
         rows2 = cursor.fetchall()
-        #print(rows2[0])
-        if rows2[0][2]==None:
-            starttidspunkt=rows2[0][3]
-        else: 
-            starttidspunkt=rows2[0][2]
+        forsteStasjonNr=rows2[0][4]
 
+        #Spørring for å finne sluttstasjon sitt StasjonNr
         cursor.execute('''SELECT * FROM Togrutetabell
         WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, sluttstasjon))
-        rows2 = cursor.fetchall()
-        if rows2[0][2]==None:
-            slutttidspunkt=rows2[0][3]
-        else:
-            slutttidspunkt=rows2[0][2]
+        rows3 = cursor.fetchall()
+        sisteStasjonNr=rows3[-1][4]
 
-        if tid1_før_tid2(slutttidspunkt, starttidspunkt):
+        if forsteStasjonNr>=sisteStasjonNr:
             continue
         else:
             gyldigeTogruteIDer.append(togruteID)
-            #print("TOGRUTE SOM KJØRER:", togruteID)
-    
+
+    if len(gyldigeTogruteIDer)==0:
+        print(f"Ingen togruter fra {startstasjon} til {sluttstasjon}")
+        return None
+
     tekst=""
     first=True
     for ruteID in gyldigeTogruteIDer:
@@ -72,20 +70,41 @@ def hentTogreise(startstasjon, sluttstasjon, dato, tid):
         else:
             tekst+=f" OR ruteID={ruteID}"
                                 
-    #Togreiser som går fra startstasjon til sluttstasjon etter gitt dato og klokkeslett: 
+    #Togreiser som går fra startstasjon til sluttstasjon (blir egentlig ikke sortert skikkelig etter dato):
     cursor.execute(f'''SELECT ruteID, togreiseID, dato, jernbanestasjonsnavn AS startstasjon, avgangstid FROM Togrute
                         INNER JOIN Togreise ON ruteID=Togreise.togruteID
                         INNER JOIN Togrutetabell ON ruteID=Togrutetabell.togruteID
                         WHERE ({tekst}) AND jernbanestasjonsnavn=?
-                        ORDER BY dato, avgangstid''', (startstasjon,))
-    rows3 = cursor.fetchall()
-    for row in rows3:
+                        ''', (startstasjon,))
+    rows4 = cursor.fetchall()
+
+    #Printer kun ut de reisene som går etter gitt dato og klokkeslett (men kan få "feil" med nattog).
+    togreiserFraStasjonEtterDato=[]
+    for row in rows4:
         datoPaaTogreise=row[2]
         tidPaaTogreise=row[4]
         if dato1_før_dato2(dato, datoPaaTogreise):
-            print("TogruteID:", row[0], "TogreiseID:", row[1], "Dato:", row[2], "Kl:", row[4])
+            togreiserFraStasjonEtterDato.append(row)
         elif (dato==datoPaaTogreise) and tid1_før_tid2(tid, tidPaaTogreise):
-            print("TogruteID:", row[0], "TogreiseID:", row[1], "Dato:", row[2], "Kl:", row[4])
+            togreiserFraStasjonEtterDato.append(row)
+
+    if len(togreiserFraStasjonEtterDato)==0:
+        print(f"Ingen togruter fra {startstasjon} til {sluttstasjon} etter {dato} {tid}")
+        return None
+
+    #Sorter listen basert på hvilken dato og klokkeslett de gyldige avgangene går. 
+    mellomListe=[]
+    for togreise in togreiserFraStasjonEtterDato:
+        datoTogreise=togreise[2]
+        tidTogreise=togreise[4]
+        #Omgjør dato og tid til datetime. 
+        mellomListe.append((togreise[0], togreise[1], togreise[2], togreise[4], datetime.strptime(datoTogreise + " " + tidTogreise, '%d.%m.%Y %H:%M')))
+
+    #Sorter basert på datetime verdien. 
+    sortertTogreiserFraStasjonEtterDato = sorted(mellomListe, key=lambda x: x[4])
+
+    for togreise in sortertTogreiserFraStasjonEtterDato:
+        print("TogruteID:", togreise[0], "TogreiseID:", togreise[1], "Dato:", togreise[2], "Kl:", togreise[3])
 
     con.close()
 
