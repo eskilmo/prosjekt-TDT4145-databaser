@@ -18,7 +18,7 @@ def hentTogruterUkedagStasjon(stasjon, ukedag):
     rows = cursor.fetchall()
     print(f"Togruter som går innom {stasjon} på {ukedag}:")
     for row in rows:
-        print(row)
+        print(f'RuteID: {row[0]} fra {row[1]} til {row[2]}')
     con.close()
 
 #hentTogruterUkedagStasjon("Bodø", "mandag")
@@ -543,15 +543,18 @@ def getPurchasehistory(kundeNR):
     cursor.execute('''SELECT b.billettID, o.ordreNR, o.bestillingsDato, o.bestillingsTid, b.startstasjon, b.endestasjon, b.avgangsdato, rp.seteNR, 
     rp.vognID, sp.sengNR, sp.vognID FROM Bestilling c JOIN Kundeordre o ON c.ordreNR = o.ordreNR JOIN BillettKjøp t ON o.ordreNR = t.ordreNR 
     JOIN Billett b on t.billettID = b.billettID LEFT JOIN ReservertSetePlass rp on rp.billettID = b.billettID 
-    LEFT JOIN ReservertSengeplass sp on sp.billettID = b.billettID WHERE c.kundeNR = 2''', (kundeNR,))
+    LEFT JOIN ReservertSengeplass sp on sp.billettID = b.billettID WHERE c.kundeNR = ?''', (kundeNR,))
     
     rows = cursor.fetchall()
     if rows== None:
         raise Exception("Du har ingen kjøp enda.")
-    print(f"Kjøpshistorikken til kundenummer {kundeNR} er:")
-    print("billettID\tordreNR\tbestillingsDato\tbestillingsTid\tstartstasjon\tendestasjon\tavgangsdato\tseteNR\tvognID\tsengNR\tvognID")
+    print(f"Kjøpshistorikken til kundenummer {kundeNR} er:\n")
     for row in rows:
-        print(row)
+        if row[7] != None:
+            print(f'BilettID: {row[0]} | OrdreNR: {row[1]} | Bestillingsdato: {row[2]} | Bestillingstid: {row[3]}\nStartstasjon: {row[4]} | Endestasjon: {row[5]} | Avgangsdato: {row[6]} | SeteNr: {row[7]} | VognID: {row[8]}')
+        else:
+            print(f'BilettID: {row[0]} | OrdreNR: {row[1]} | Bestillingsdato: {row[2]} | Bestillingstid: {row[3]}\nStartstasjon: {row[4]} | Endestasjon: {row[5]} | Avgangsdato: {row[6]} | SengNr: {row[9]} | VognID: {row[10]}')
+        print('\n')
     con.close()
 #mangler å få inn vognnr, setenr etc
 
