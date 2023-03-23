@@ -282,9 +282,8 @@ def getPurchasehistory(kundeNR):
 #mangler å få inn vognnr, setenr etc
 
 
+
 #metode som skal kjøres når fila kjøres for at brukeren får valget om hvilken handling den vil gjøre
-
-
 def launch():
     print('''\n\nA Hent togruter som er innom en stasjon på en ukedag.\nB Finn togruter fra start- til sluttstasjon\nC Registrer som ny kunde\nD Finn og kjøp billetter\nE Dine reiser\n\n''')
     valg = str(input("(Svar en av bokstavene over.)\nHvilken handling vil du gjøre?"))
