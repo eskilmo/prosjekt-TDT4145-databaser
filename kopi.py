@@ -49,6 +49,7 @@ if plass.lower() == "seng":
     rows = cursor.fetchall()
     print(rows)
 
+
 else:
     cursor.execute('''SELECT * 
                     FROM SeteLedigPåDelstrekning INNER JOIN Togreise
@@ -56,3 +57,11 @@ else:
                     WHERE (Togreise.dato = ? AND ledig = 1)''', (dato,))
     rows = cursor.fetchall()
     print(rows)
+
+
+SELECT SLPT.togreiseID, SLPT.vognID, SLPT.sengNR, SLPT.ledig, T.togruteID, T.dato, Tt.jernbanestasjonsnavn, Tt.avgangstid
+FROM SengLedigPåTogreise as SLPT INNER JOIN Togreise as T
+on SLPT.togreiseID = T.togreiseID
+INNER JOIN Togrutetabell as Tt
+on Tt.togruteID = T.togruteID
+WHERE (T.dato = "03.04.2023" AND ledig = 1);
