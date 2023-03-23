@@ -269,8 +269,9 @@ def getPurchasehistory(kundeNR):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
     #cursor.execute('''SELECT * FROM Kundeordre WHERE ordreNR IN (SELECT ordreNR FROM Bestilling WHERE kundeNR = ?)''', (kundeNR))
-    
-    rows = cursor.fetchall()
+    cursor.execute()
+    rows = cursor.fetchall('''SELECT o.ordreNR, MAX(t.startstasjon) as start FROM Bestilling c JOIN Kundeordre o ON c.ordreNR = o.ordreNR 
+    JOIN BillettKjøp t ON o.ordreNR = t.ordreNR JOIN Billett b on t.billettID = b.billettID WHERE c.kundeNR = ? GROUP BY o.ordreNR''', (kundeNR))
 
     #cursor.execute('''SELECT *, MAX(startstasjon) as start FROM Billett WHERE billettID IN (SELECT billettID FROM BillettKjøp WHERE ordreNR IN (SELECT ordreNR FROM Bestilling WHERE kundeNR = ?))''', (kundeNR))
     #cursor.execute('''SELECT bk.ordreID, MIN(bt.startstasjon) as start, FROM BillettKjøp bk JOIN Billett bt ON bk.billettID = bt.billettID GROUP BY bk.ordreID ''')
