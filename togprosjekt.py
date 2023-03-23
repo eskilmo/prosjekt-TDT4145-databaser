@@ -180,6 +180,7 @@ def registrateCustomer():
         raise Exception("Tlf eller epost er allerede registrert i kunderegisteret.")
     
     cursor.execute("INSERT INTO Kunde (kundeNR, mobilNR, epost, navn) VALUES ( ?, ?, ?, ?)", (kundenummer, tlf, epost, navn))
+    print(f"Kundenummeret ditt er: {kundenummer}")
     con.commit()
     con.close()
 
@@ -218,7 +219,7 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
         ordreNR = len(rows) + 1
     
     cursor.execute('''INSERT INTO Bestilling VALUES (?, ?)''', (kundeNR, ordreNR))
-    antallBilletter = input("Hvor mange billetter vil du kjøpe? Du kan ikke kjøpe mer enn det som er ledig.")
+    #antallBilletter = input("Hvor mange billetter vil du kjøpe? Du kan ikke kjøpe mer enn det som er ledig.")
     #if antallBilletter > ledigeBilletter:
     #    raise Exception(f"Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er {ledigeBilletter} ledige billetter igjen. ")
     feilbestillingsdato = date.today().strftime("%d/%m/%Y")
@@ -590,7 +591,6 @@ def launch():
         cursor = con.cursor()
         cursor.execute("SELECT DISTINCT dato FROM Togreise")
         rows = cursor.fetchall()
-        print(rows)
         dato = input("Hvilken dato vil du reise? ")
         datoer = []
         for row in rows:
