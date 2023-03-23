@@ -105,6 +105,36 @@ def kjop(dato, startstasjon, sluttstasjon, plass):
         for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
             print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
 
+    #Lar kunden velge sete og lagrer variable
+    valgtTogreise = int(input("Velg togreise: "))
+    gyldigTogreise = False
+    for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
+        if ledigSetePaaTogreise[0][0] == valgtTogreise:
+            gyldigTogreise = True
+            print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
+
+    if gyldigTogreise:
+        valgtVogn = int(input("Velg vognNR: "))
+        gyldigVogn = False
+        for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
+            if ledigSetePaaTogreise[0][0] == valgtTogreise and ledigSetePaaTogreise[0][2] == valgtVogn:
+                gyldigVogn = True
+                print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
+                
+        if gyldigVogn:
+            valgtSete = int(input("Velg seteNR: "))
+            gyldigSete = False
+            for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
+                if ledigSetePaaTogreise[0][0] == valgtTogreise and ledigSetePaaTogreise[0][2] == valgtVogn and ledigSetePaaTogreise[0][3] == valgtSete:
+                    gyldigSete = True
+                    print("HURRA!")
+            if not(gyldigSete):
+                print("Ikke gyldig seteNR")
+                
+        else:
+            print("Ikke gyldig vognNR")
+    else:
+        print("Ikke gyldig togreise")
 
 def retning(startstasjon, sluttstasjon): 
     con = sq.connect('prosjekt.db')
