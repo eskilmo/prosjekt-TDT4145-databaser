@@ -149,7 +149,7 @@ hentTogreise("Trondheim", "Fauske", "03.04.2023", "00:00")
 
 #e) En bruker skal kunne registrere seg i kunderegisteret
 
-def registrate_customer():
+def registrateCustomer():
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
     cursor.execute("SELECT * FROM Kunde")
@@ -162,7 +162,7 @@ def registrate_customer():
     print("Kan ikke inneholde tall.")
     navn = str(input("Navn: "))
 
-    if len(navn)>40 or has_numbers(navn):
+    if len(navn)>40 or hasNumbers(navn):
         raise Exception("Ugyldig navn.")
     
     pattern = re.compile("[^@]+@[^@]+\.[^@]+")
@@ -187,11 +187,11 @@ def registrate_customer():
 
 #kilde: https://stackoverflow.com/questions/19859282/check-if-a-string-contains-a-number
 #Hjelpemetode for å sjekke om det er tall i navnet
-def has_numbers(inputString):
+def hasNumbers(inputString):
     return any(char.isdigit() for char in inputString)
 
 #Hjelpemetode til g) for å sjekke om kunden er registrert før billettkjøp
-def valid_customer(navn,epost):
+def validCustomer(navn,epost):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
     cursor.execute("SELECT * FROM Kunde")
@@ -202,12 +202,12 @@ def valid_customer(navn,epost):
     con.close()
     return False
 #g) 
-def buy_tickets():
+def buyTickets():
     print("Login for å få kjøpt billetter:")
     print("(Du må være en registrert kunde i kunderegisteret.)")
     navn = input("Navn: ")
     epost = input("Epost: ")
-    if valid_customer(navn, epost) == False:
+    if validCustomer(navn, epost) == False:
             raise Exception("Navn og epost matcher ikke med en kunde i kunderegisteret.")
     
     #få metode for å få inn alle e finne ledige billetter for en oppgitt strekning 
@@ -261,6 +261,12 @@ def buy_tickets():
 
     con.commit()
     con.close()
+
+
+#h)
+
+def getPurchasehistory(kundeNR):
+
     
 
 
