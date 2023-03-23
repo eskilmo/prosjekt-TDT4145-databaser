@@ -204,6 +204,7 @@ def buy_tickets():
     epost = input("Epost: ")
     if valid_customer(navn, epost) == False:
             raise Exception("Du har ikke registrert deg i kunderegisteret.")
+    
     #få metode for å få inn alle e finne ledige billetter for en oppgitt strekning 
     #på en ønsket togrute og kjøpe de billettene hen ønsker
     #ledigeBilletter=
@@ -231,6 +232,7 @@ def buy_tickets():
             bestillingsTid += element
         else:
             bestillingsTid += element + "."
+    
     cursor.execute('''INSERT INTO Kundeordre VALUES (?, ?, ?, ?)''', (antallBilletter, ordreNR, bestillingsDato, bestillingsTid))
     cursor.execute("SELECT * FROM BillettKjøp")
     rows = cursor.fetchall()
@@ -243,7 +245,17 @@ def buy_tickets():
     cursor.execute('''INSERT INTO Billett VALUES (?, ?, ?, ?)''', (billettID, startstasjon, sluttstasjon, avgangsdato))
     #når billettkjøpet har blitt registrert må de aktuelle setene/sengene bli gjort om til 
     # å ikke være ledig lengre 
+    
+    if plass.lower() == "seng":
+        cursor.execute('''INSERT INTO ReservertSengeplass VALUES (?, ?, ?)''', (billettID, sengNR, vognID))
+        cursor.execute('''UPDATE SengLedigPåTogReise SET ledig = FALSE WHERE sengNR = ?''', (sengNR))
+    
+    else:
+        cursor.execute('''INSERT INTO ReservertSeteplass VALUES (?, ?, ?)''', (billettID, seteNR, vognID))
+        cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = FALSE WHERE sengNR = ?''', (sengNR))
 
+    con.commit()
+    con.close()
     
 
 
