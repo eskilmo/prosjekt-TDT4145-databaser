@@ -228,17 +228,18 @@ def buyTickets():
     antallBilletter = input("Hvor mange billetter vil du kjøpe? Du kan ikke kjøpe mer enn det som er ledig.")
     #if antallBilletter > ledigeBilletter:
     #    raise Exception(f"Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er {ledigeBilletter} ledige billetter igjen. ")
-    bestillingsDato = date.today().strftime("%d/%m/%Y")
-    #feilbestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
-    splittet = bestillingsDato.split("/")
-    bestillingsTid = ""
+    feilbestillingsdato = date.today().strftime("%d/%m/%Y")
+    bestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
+    splittet = feilbestillingsdato.split("/")
+    bestillingsdato = ""
     for element in splittet:
         if len(element) > 2:
-            bestillingsTid += element
+            bestillingsdato += element
         else:
-            bestillingsTid += element + "."
+            bestillingsdato += element + "."
+
     
-    cursor.execute('''INSERT INTO Kundeordre VALUES (?, ?, ?, ?)''', (antallBilletter, ordreNR, bestillingsDato, bestillingsTid))
+    cursor.execute('''INSERT INTO Kundeordre VALUES (?, ?, ?, ?)''', (antallBilletter, ordreNR, bestillingsdato, bestillingstid))
     cursor.execute("SELECT * FROM BillettKjøp")
     rows = cursor.fetchall()
     if rows == None:
