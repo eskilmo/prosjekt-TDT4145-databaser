@@ -1,5 +1,6 @@
 import sqlite3 as sq
 
+
 def buy_tickets():
     con = sq.connect("prosjekt.db")
     cursor = con.cursor()
@@ -48,12 +49,14 @@ def kjop():
     if plass.lower() == "seng":
 
         ledigeSenger=[]
-        cursor.execute('''SELECT SLPT.togreiseID, SLPT.vognID, SLPT.sengNR, SLPT.ledig, T.togruteID, T.dato, Tt.jernbanestasjonsnavn, Tt.avgangstid
+        cursor.execute('''SELECT SLPT.togreiseID, SLPT.vognID, SLPT.sengNR, SLPT.ledig, T.togruteID, T.dato, Tt.jernbanestasjonsnavn, Tt.avgangstid, Togrute.hovedretning
                 FROM SengLedigPåTogreise as SLPT INNER JOIN Togreise as T
                 on SLPT.togreiseID = T.togreiseID
                 INNER JOIN Togrutetabell as Tt
                 on Tt.togruteID = T.togruteID
-                WHERE (T.dato = ? AND ledig = 1) AND jernbanestasjonsnavn="Trondheim";''', (dato,))
+                INNER JOIN Togrute
+                on T.togruteID = Togrute.ruteID
+                WHERE ((T.dato = ? AND ledig = 1) AND jernbanestasjonsnavn = ?) AND Togrute.hovedretning = ?;''', (dato, startstasjon, brukerretning))
         sengePlasser = cursor.fetchall()
 
         for i in range(0,len(sengePlasser)-1,2):
