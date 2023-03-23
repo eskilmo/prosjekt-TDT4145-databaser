@@ -253,11 +253,13 @@ def buyTickets():
     
     if plass.lower() == "seng":
         cursor.execute('''INSERT INTO ReservertSengeplass VALUES (?, ?, ?)''', (billettID, sengNR, vognID))
-        cursor.execute('''UPDATE SengLedigPåTogReise SET ledig = False WHERE sengNR = ?''', (sengNR))
+        cursor.execute('''UPDATE SengLedigPåTogReise SET ledig = False 
+                        WHERE sengNR=? and vognID=? and togreiseID=1 and delstrekningsID=1''', (sengNR, vognID, togreiseID, delstrekningsID))
     
     else:
         cursor.execute('''INSERT INTO ReservertSeteplass VALUES (?, ?, ?)''', (billettID, seteNR, vognID))
-        cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False WHERE sengNR = ?''', (sengNR))
+        cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False
+                        WHERE seteNR=? and vognID=? and togreiseID=1 and delstrekningsID=1''', (seteNR, vognID, togreiseID, delstrekningsID))
 
     con.commit()
     con.close()
