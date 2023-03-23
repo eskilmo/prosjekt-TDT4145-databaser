@@ -239,6 +239,8 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass):
             bestillingsdato += element + "."
 
     
+    togreiseID, vognID, plassNR = kjop(dato, startstasjon, sluttstasjon, plass)
+    
     cursor.execute('''INSERT INTO Kundeordre VALUES (?, ?, ?, ?)''', (antallBilletter, ordreNR, bestillingsdato, bestillingstid))
     cursor.execute("SELECT * FROM BillettKjøp")
     rows = cursor.fetchall()
@@ -248,22 +250,163 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass):
         billettID = len(rows) + 1
     cursor.execute('''INSERT INTO BillettKjøp VALUES (?, ?)''', (billettID, ordreNR))
     #husk å legge til rett variabelnavn
-    cursor.execute('''INSERT INTO Billett VALUES (?, ?, ?, ?)''', (billettID, startstasjon, endestasjon, avgangsdato))
+    cursor.execute('''INSERT INTO Billett VALUES (?, ?, ?, ?)''', (billettID, startstasjon, sluttstasjon, dato))
     #når billettkjøpet har blitt registrert må de aktuelle setene/sengene bli gjort om til 
     # å ikke være ledig lengre 
     
     if plass.lower() == "seng":
-        cursor.execute('''INSERT INTO ReservertSengeplass VALUES (?, ?, ?)''', (billettID, sengNR, vognID))
+        cursor.execute('''INSERT INTO ReservertSengeplass VALUES (?, ?, ?)''', (billettID, plassNR, vognID))
         cursor.execute('''UPDATE SengLedigPåTogReise SET ledig = False 
-                        WHERE sengNR=? and vognID=? and togreiseID=?''', (sengNR, vognID, togreiseID))
+                        WHERE sengNR=? and vognID=? and togreiseID=?''', (plassNR, vognID, togreiseID))
     
     elif plass.lower() == "sete":
-        cursor.execute('''INSERT INTO ReservertSeteplass VALUES (?, ?, ?)''', (billettID, seteNR, vognID))
+        cursor.execute('''INSERT INTO ReservertSeteplass VALUES (?, ?, ?)''', (billettID, plassNR, vognID))
         cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False
-                        WHERE seteNR=? and vognID=? and togreiseID=? and delstrekningsID=?''', (seteNR, vognID, togreiseID, delstrekningsID))
+                        WHERE seteNR=? and vognID=? and togreiseID=? and delstrekningsID=?''', (plassNR, vognID, togreiseID, delstrekningsID))
 
     con.commit()
     con.close()
+
+
+def kjop(dato, startstasjon, sluttstasjon, plass):
+    con = sq.connect("prosjekt.db")
+    cursor = con.cursor()
+
+    #Input flyttes ut av funksjonen
+    # dato = input("Hvilken dato vil du reise? ")
+    # startstasjon = input("Hvor reiser du fra? ")
+    # sluttstasjon = input("Hvor vil du reise til? ")
+    # plass = input("Seng eller sete? ")
+    
+    #Finner ledige senger
+    if plass.lower() == "seng":
+
+        ledigeSenger=[]
+        brukerretning=retning(startstasjon, sluttstasjon)
+        cursor.execute('''SELECT SLPT.togreiseID, SLPT.vognID, SLPT.sengNR, SLPT.ledig, T.togruteID, T.dato, Tt.jernbanestasjonsnavn, Tt.avgangstid, Togrute.hovedretning
+                FROM SengLedigPåTogreise as SLPT INNER JOIN Togreise as T
+                on SLPT.togreiseID = T.togreiseID
+                INNER JOIN Togrutetabell as Tt
+                on Tt.togruteID = T.togruteID
+                INNER JOIN Togrute
+                on T.togruteID = Togrute.ruteID
+                WHERE ((T.dato = ?) AND jernbanestasjonsnavn = ?) AND Togrute.hovedretning = ?;''', (dato, startstasjon, brukerretning))
+        sengePlasser = cursor.fetchall()
+
+        for i in range(0,len(sengePlasser)-1,2):
+            if sengePlasser[i][3]==1 and sengePlasser[i+1][3]:
+                ledigeSenger.append(sengePlasser[i])
+                ledigeSenger.append(sengePlasser[i+1])
+        
+        if len(ledigeSenger)==0:
+            print(f"Ingen ledige senger fra {startstasjon} {dato}")
+            return None, None, None
+        else:
+            print("Ledige sengeplasser:")
+            for seng in ledigeSenger:
+                print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} i vogn nummer {seng[1]} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
+
+
+    #Lar kunden velge seng og lagrer variable
+        valgtTogreise = int(input("Velg togreise: "))
+        gyldigTogreise = False
+        for seng in ledigeSenger:
+            if seng[0] == valgtTogreise:
+                gyldigTogreise = True
+                print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} i vogn nummer {seng[1]} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
+
+        if gyldigTogreise:
+            valgtVogn = int(input("Velg vognNR: "))
+            gyldigVogn = False
+            for seng in ledigeSenger:
+                if seng[0] == valgtTogreise and seng[1] == valgtVogn:
+                    gyldigVogn = True
+                    print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} i vogn nummer {seng[1]} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
+
+            if gyldigVogn:
+                valgtSeng = int(input("Velg sengNR: "))
+                gyldigSeng = False
+                for seng in ledigeSenger:
+                    if seng[0] == valgtTogreise and seng[1] == valgtVogn and seng[2] == valgtSeng:
+                        gyldigSeng = True
+                        print("HURRA!")
+                if not(gyldigSeng):
+                    print("Ikke gyldig sengNR")
+
+            else:
+                print("Ikke gyldig vognNR")
+        else:
+            print("Ikke gyldig togreise")
+
+        return valgtTogreise, valgtVogn, valgtSeng
+    
+    #Finner ledige sitteplasser  
+    elif plass.lower() == "sete":
+        ledigeSeterPaaValgtTogreise=[]
+        for togreiseID in hentTogreiseIDer(startstasjon, sluttstasjon, dato, "00:00"):
+            cursor.execute('''SELECT DISTINCT vognID
+                            FROM SeteIVogn NATURAL JOIN Vognoppsett
+                            INNER JOIN Togreise ON ruteID=togruteID
+                            WHERE (togreiseID=?) and dato=?''', (togreiseID, dato))
+            vognIDer = cursor.fetchall()
+
+            for vognID in vognIDer:
+                cursor.execute('''SELECT DISTINCT seteNR
+                                FROM SeteIVogn NATURAL JOIN Vognoppsett
+                                INNER JOIN Togreise ON ruteID=togruteID
+                                WHERE (togreiseID=?) and dato=? and vognID=?''', (togreiseID, dato, vognID[0]))
+                seteIDer = cursor.fetchall()
+
+                for seteNR in seteIDer:
+                    seteLedigPaaDelstrekning=[]
+
+                    for delstrekingID in finneDelstrekninger(startstasjon, sluttstasjon):
+                        cursor.execute('''SELECT * 
+                                        FROM SeteLedigPåDelstrekning INNER JOIN Togreise
+                                        on SeteLedigPåDelstrekning.togreiseID = Togreise.togreiseID
+                                        WHERE (Togreise.dato = ? and SeteLedigPåDelstrekning.togreiseID=? and vognID=? AND seteNR=? AND delstrekningsID=? and ledig = 1)''', (dato, togreiseID, vognID[0], seteNR[0], delstrekingID))
+                        ledigSete = cursor.fetchall()
+                        if ledigSete!=None:
+                            seteLedigPaaDelstrekning.append(ledigSete[0][1])
+
+                    if sorted(seteLedigPaaDelstrekning)==finneDelstrekninger(startstasjon, sluttstasjon):
+                        ledigeSeterPaaValgtTogreise.append(ledigSete)
+        
+        for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
+            print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
+    
+        #Lar kunden velge sete og lagrer variable
+        valgtTogreise = int(input("Velg togreise: "))
+        gyldigTogreise = False
+        for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
+            if ledigSetePaaTogreise[0][0] == valgtTogreise:
+                gyldigTogreise = True
+                print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
+
+        if gyldigTogreise:
+            valgtVogn = int(input("Velg vognNR: "))
+            gyldigVogn = False
+            for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
+                if ledigSetePaaTogreise[0][0] == valgtTogreise and ledigSetePaaTogreise[0][2] == valgtVogn:
+                    gyldigVogn = True
+                    print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
+
+            if gyldigVogn:
+                valgtSete = int(input("Velg seteNR: "))
+                gyldigSete = False
+                for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
+                    if ledigSetePaaTogreise[0][0] == valgtTogreise and ledigSetePaaTogreise[0][2] == valgtVogn and ledigSetePaaTogreise[0][3] == valgtSete:
+                        gyldigSete = True
+                        print("HURRA!")
+                if not(gyldigSete):
+                    print("Ikke gyldig seteNR")
+
+            else:
+                print("Ikke gyldig vognNR")
+        else:
+            print("Ikke gyldig togreise")
+
+        return valgtTogreise, valgtVogn, valgtSete
 
 
 #h)
