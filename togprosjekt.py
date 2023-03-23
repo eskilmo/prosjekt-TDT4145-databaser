@@ -247,7 +247,7 @@ def buyTickets():
         billettID = len(rows) + 1
     cursor.execute('''INSERT INTO BillettKjøp VALUES (?, ?)''', (billettID, ordreNR))
     #husk å legge til rett variabelnavn
-    cursor.execute('''INSERT INTO Billett VALUES (?, ?, ?, ?)''', (billettID, startstasjon, sluttstasjon, avgangsdato))
+    cursor.execute('''INSERT INTO Billett VALUES (?, ?, ?, ?)''', (billettID, startstasjon, endestasjon, avgangsdato))
     #når billettkjøpet har blitt registrert må de aktuelle setene/sengene bli gjort om til 
     # å ikke være ledig lengre 
     
@@ -272,11 +272,27 @@ def getPurchasehistory(kundeNR):
     c.ordreNR = o.ordreNR JOIN BillettKjøp t ON o.ordreNR = t.ordreNR JOIN Billett b on t.billettID = b.billettID WHERE c.kundeNR = 2''', (kundeNR))
     
     rows = cursor.fetchall()
+    if rows== None:
+        print("Du har ingen kjøp enda.")
     print(f"Kjøpshistorikken til kundenummer {kundeNR} er:")
     print("ordreNR\tbetalingsdato\tbetalingsDato\tbetalingsTid\tstartstasjon\tendestasjon\tavgangsdato")
     for row in rows:
         print(row)
     con.close()
+#mangler å få inn vognnr, setenr etc
+
+
+#metode som skal kjøres når fila kjøres for at brukeren får valget om hvilken handling den vil gjøre
+
+def launch():
+    print('''A Hent togruter som er innom en stasjon på en ukedag.\nB Finn togruter 
+    fra start- til sluttstasjon\nC Registrer som ny kunde\nD Finn og kjøp billetter \E Dine reiser''')
+    valg = str(input("Hvilken handling vil du gjøre?(Svar en av bokstavene over.)"))
+
+    if valg == "A" or valg == "B":
+        stasjon = input("Stasjon: ")
+        dag = input("Dag: ")
+        hentTogruterUkedagStasjon(stasjon,dag)
 
 
 
