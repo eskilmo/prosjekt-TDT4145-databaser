@@ -48,10 +48,12 @@ def kjop():
     if plass.lower() == "seng":
 
         ledigeSenger=[]
-        cursor.execute('''SELECT * 
-                        FROM SengLedigPåTogreise INNER JOIN Togreise
-                        on SengLedigPåTogreise.togreiseID = Togreise.togreiseID
-                        WHERE (Togreise.dato = ? AND ledig = 1)''', (dato,))
+        cursor.execute('''SELECT SLPT.togreiseID, SLPT.vognID, SLPT.sengNR, SLPT.ledig, T.togruteID, T.dato, Tt.jernbanestasjonsnavn, Tt.avgangstid
+                FROM SengLedigPåTogreise as SLPT INNER JOIN Togreise as T
+                on SLPT.togreiseID = T.togreiseID
+                INNER JOIN Togrutetabell as Tt
+                on Tt.togruteID = T.togruteID
+                WHERE (T.dato = ? AND ledig = 1) AND jernbanestasjonsnavn="Trondheim";''', (dato,))
         sengePlasser = cursor.fetchall()
 
         for i in range(0,len(sengePlasser)-1,2):
@@ -59,10 +61,13 @@ def kjop():
                 ledigeSenger.append(sengePlasser[i])
                 ledigeSenger.append(sengePlasser[i+1])
         
-        for seng in ledigeSenger:
-            print(f"Ledig sengnr {seng[2]} i kupenr {(seng[2]+1)//2} på togreise {seng[0]}")
-        # print(ledigeSenger)
-
+        if len(ledigeSenger)==0:
+            print(f"Ingen ledige senger fra {startstasjon} {dato}")
+        else:
+            print("Ledige sengeplasser:")
+            for seng in ledigeSenger:
+                print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
+        
     else:
         cursor.execute('''SELECT * 
                         FROM SeteLedigPåDelstrekning INNER JOIN Togreise
@@ -71,10 +76,4 @@ def kjop():
         rows = cursor.fetchall()
         print(rows)
 
-
-SELECT SLPT.togreiseID, SLPT.vognID, SLPT.sengNR, SLPT.ledig, T.togruteID, T.dato, Tt.jernbanestasjonsnavn, Tt.avgangstid
-FROM SengLedigPåTogreise as SLPT INNER JOIN Togreise as T
-on SLPT.togreiseID = T.togreiseID
-INNER JOIN Togrutetabell as Tt
-on Tt.togruteID = T.togruteID
-WHERE (T.dato = "03.04.2023" AND ledig = 1);
+kjop()
