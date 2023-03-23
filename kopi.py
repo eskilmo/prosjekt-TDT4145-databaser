@@ -55,7 +55,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass):
                 on Tt.togruteID = T.togruteID
                 INNER JOIN Togrute
                 on T.togruteID = Togrute.ruteID
-                WHERE ((T.dato = ? AND ledig = 1) AND jernbanestasjonsnavn = ?) AND Togrute.hovedretning = ?;''', (dato, startstasjon, brukerretning))
+                WHERE ((T.dato = ?) AND jernbanestasjonsnavn = ?) AND Togrute.hovedretning = ?;''', (dato, startstasjon, brukerretning))
         sengePlasser = cursor.fetchall()
 
         for i in range(0,len(sengePlasser)-1,2):
@@ -68,8 +68,39 @@ def kjop(dato, startstasjon, sluttstasjon, plass):
         else:
             print("Ledige sengeplasser:")
             for seng in ledigeSenger:
-                print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
+                print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} i vogn nummer {seng[1]} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
 
+
+    #Lar kunden velge seng og lagrer variable
+        valgtTogreise = int(input("Velg togreise: "))
+        gyldigTogreise = False
+        for seng in ledigeSenger:
+            if seng[0] == valgtTogreise:
+                gyldigTogreise = True
+                print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} i vogn nummer {seng[1]} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
+
+        if gyldigTogreise:
+            valgtVogn = int(input("Velg vognNR: "))
+            gyldigVogn = False
+            for seng in ledigeSenger:
+                if seng[0] == valgtTogreise and seng[1] == valgtVogn:
+                    gyldigVogn = True
+                    print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} i vogn nummer {seng[1]} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
+
+            if gyldigVogn:
+                valgtSeng = int(input("Velg sengNR: "))
+                gyldigSeng = False
+                for seng in ledigeSenger:
+                    if seng[0] == valgtTogreise and seng[1] == valgtVogn and seng[2] == valgtSeng:
+                        gyldigSeng = True
+                        print("HURRA!")
+                if not(gyldigSeng):
+                    print("Ikke gyldig sengNR")
+
+            else:
+                print("Ikke gyldig vognNR")
+        else:
+            print("Ikke gyldig togreise")
     #Finner ledige sitteplasser  
     else:
         ledigeSeterPaaValgtTogreise=[]
