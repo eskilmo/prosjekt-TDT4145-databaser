@@ -290,7 +290,7 @@ def launch():
 
     if valg == "A" or valg == "a":
         stasjon = input("Stasjon: ")
-        dag = input("Dag: ")
+        dag = input("Dag: ").lower()
         hentTogruterUkedagStasjon(stasjon,dag)
     
     elif valg == "B" or valg == "b":

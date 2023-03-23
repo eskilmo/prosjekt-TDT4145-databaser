@@ -33,19 +33,17 @@ def buy_tickets():
     #bestillingstid = 
 
     
-def kjop():
+def kjop(dato, startstasjon, sluttstasjon, plass):
     con = sq.connect("prosjekt.db")
     cursor = con.cursor()
 
+    #Input flyttes ut av funksjonen
     # dato = input("Hvilken dato vil du reise? ")
     # startstasjon = input("Hvor reiser du fra? ")
     # sluttstasjon = input("Hvor vil du reise til? ")
     # plass = input("Seng eller sete? ")
-    dato = "03.04.2023"
-    startstasjon = "Trondheim"
-    sluttstasjon = "Fauske"
-    plass = "sete"
-
+    
+    #Finner ledige senger
     if plass.lower() == "seng":
 
         ledigeSenger=[]
@@ -71,7 +69,8 @@ def kjop():
             print("Ledige sengeplasser:")
             for seng in ledigeSenger:
                 print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
-        
+
+    #Finner ledige sitteplasser  
     else:
         ledigeSeterPaaValgtTogreise=[]
         for togreiseID in hentTogreiseIDer(startstasjon, sluttstasjon, dato, "00:00"):
