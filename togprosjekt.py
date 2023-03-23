@@ -270,14 +270,16 @@ def buyTickets():
 def getPurchasehistory(kundeNR):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
-    cursor.execute('''SELECT o.ordreNR, o.bestillingsDato, o.bestillingsTid, b.startstasjon, b.endestasjon, b.avgangsdato FROM Bestilling c JOIN Kundeordre o ON 
-    c.ordreNR = o.ordreNR JOIN BillettKjøp t ON o.ordreNR = t.ordreNR JOIN Billett b on t.billettID = b.billettID WHERE c.kundeNR = 2''', (kundeNR))
+    cursor.execute('''SELECT b.billettID, o.ordreNR, o.bestillingsDato, o.bestillingsTid, b.startstasjon, b.endestasjon, b.avgangsdato, rp.seteNR, 
+    rp.vognID, sp.sengNR, sp.vognID FROM Bestilling c JOIN Kundeordre o ON c.ordreNR = o.ordreNR JOIN BillettKjøp t ON o.ordreNR = t.ordreNR 
+    JOIN Billett b on t.billettID = b.billettID LEFT JOIN ReservertSetePlass rp on rp.billettID = b.billettID 
+    LEFT JOIN ReservertSengeplass sp on sp.billettID = b.billettID WHERE c.kundeNR = 2''', (kundeNR))
     
     rows = cursor.fetchall()
     if rows== None:
         raise Exception("Du har ingen kjøp enda.")
     print(f"Kjøpshistorikken til kundenummer {kundeNR} er:")
-    print("ordreNR\tbetalingsdato\tbetalingsDato\tbetalingsTid\tstartstasjon\tendestasjon\tavgangsdato")
+    print("billettID\tordreNR\tbestillingsDato\tbestillingsTid\tstartstasjon\tendestasjon\tavgangsdato\tseteNR\tvognID\tsengNR\tvognID")
     for row in rows:
         print(row)
     con.close()
