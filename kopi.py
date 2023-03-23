@@ -1,5 +1,5 @@
 import sqlite3 as sq
-
+from datetime import date, datetime
 
 def buy_tickets():
     con = sq.connect("prosjekt.db")
