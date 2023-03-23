@@ -40,7 +40,6 @@ startstasjon = input("Hvor reiser du fra? ")
 sluttstasjon = input("Hvor vil du reise til? ")
 plass = input("Seng eller sete? ")
 
-cursor.execute()
 
 if plass.lower() == "seng":
     cursor.execute('''SELECT * 
