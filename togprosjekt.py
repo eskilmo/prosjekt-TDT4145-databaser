@@ -202,13 +202,8 @@ def validCustomer(navn,epost):
     con.close()
     return False
 #g) 
-def buyTickets(dato, startstasjon, sluttstasjon, plass):
-    print("Login for å få kjøpt billetter:")
-    print("(Du må være en registrert kunde i kunderegisteret.)")
-    navn = input("Navn: ")
-    epost = input("Epost: ")
-    if validCustomer(navn, epost) == False:
-            raise Exception("Navn og epost matcher ikke med en kunde i kunderegisteret.")
+def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
+    
     
     #få metode for å få inn alle e finne ledige billetter for en oppgitt strekning 
     #på en ønsket togrute og kjøpe de billettene hen ønsker
@@ -272,12 +267,6 @@ def kjop(dato, startstasjon, sluttstasjon, plass):
     con = sq.connect("prosjekt.db")
     cursor = con.cursor()
 
-    #Input flyttes ut av funksjonen
-    # dato = input("Hvilken dato vil du reise? ")
-    # startstasjon = input("Hvor reiser du fra? ")
-    # sluttstasjon = input("Hvor vil du reise til? ")
-    # plass = input("Seng eller sete? ")
-    
     #Finner ledige senger
     if plass.lower() == "seng":
 
@@ -407,6 +396,141 @@ def kjop(dato, startstasjon, sluttstasjon, plass):
             print("Ikke gyldig togreise")
 
         return valgtTogreise, valgtVogn, valgtSete
+    
+
+#Hjelpefunksjoner
+
+def retning(startstasjon, sluttstasjon): 
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute('''SELECT stasjonNR FROM Togrutetabell
+            WHERE togruteID=1 and (jernbanestasjonsnavn=?)''', (startstasjon,))
+    startStasjonNr=int(cursor.fetchall()[0][0])
+    cursor.execute('''SELECT stasjonNR FROM Togrutetabell
+            WHERE togruteID=1 and (jernbanestasjonsnavn=?)''', (sluttstasjon,))
+    sluttStasjonNr=int(cursor.fetchall()[0][0])
+    if startStasjonNr<sluttStasjonNr:
+        return "med"
+    else: 
+        return "mot"
+
+def hentTogreiseIDer(startstasjon, sluttstasjon, dato, tid):
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute('''SELECT togruteID FROM Togrutetabell
+        WHERE jernbanestasjonsnavn=? or jernbanestasjonsnavn=?
+        GROUP BY togruteID
+        HAVING count(jernbanestasjonsnavn)=2''', (startstasjon, sluttstasjon))
+    rows = cursor.fetchall()
+    print(f"Togruter som går fra {startstasjon} til {sluttstasjon} etter {dato} kl {tid}:")
+
+    #Finner og lagrer alle togreiser som kjører mellom start og slutt (må sjekke om de går riktig vei). 
+    gyldigeTogruteIDer=[]
+    for row in rows:
+        togruteID = row[0]
+        
+        #Spørring for å finne startstasjon sitt StasjonNr
+        cursor.execute('''SELECT * FROM Togrutetabell
+        WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, startstasjon))
+        rows2 = cursor.fetchall()
+        forsteStasjonNr=rows2[0][4]
+
+        #Spørring for å finne sluttstasjon sitt StasjonNr
+        cursor.execute('''SELECT * FROM Togrutetabell
+        WHERE togruteID=? and jernbanestasjonsnavn=?''', (togruteID, sluttstasjon))
+        rows3 = cursor.fetchall()
+        sisteStasjonNr=rows3[-1][4]
+
+        if forsteStasjonNr>=sisteStasjonNr:
+            continue
+        else:
+            gyldigeTogruteIDer.append(togruteID)
+
+    if len(gyldigeTogruteIDer)==0:
+        print(f"Ingen togruter fra {startstasjon} til {sluttstasjon}")
+        return False
+
+    tekst=""
+    first=True
+    for ruteID in gyldigeTogruteIDer:
+        if first:
+            tekst+=f"ruteID={ruteID}"
+            first=False
+        else:
+            tekst+=f" OR ruteID={ruteID}"
+                                
+    #Togreiser som går fra startstasjon til sluttstasjon (blir egentlig ikke sortert skikkelig etter dato):
+    cursor.execute(f'''SELECT ruteID, togreiseID, dato, jernbanestasjonsnavn AS startstasjon, avgangstid FROM Togrute
+                        INNER JOIN Togreise ON ruteID=Togreise.togruteID
+                        INNER JOIN Togrutetabell ON ruteID=Togrutetabell.togruteID
+                        WHERE ({tekst}) AND jernbanestasjonsnavn=?
+                        ''', (startstasjon,))
+    rows4 = cursor.fetchall()
+
+    #Printer kun ut de reisene som går etter gitt dato og klokkeslett (men kan få "feil" med nattog).
+    togreiserFraStasjonEtterDato=[]
+    for row in rows4:
+        datoPaaTogreise=row[2]
+        tidPaaTogreise=row[4]
+        if dato1_før_dato2(dato, datoPaaTogreise):
+            togreiserFraStasjonEtterDato.append(row)
+        elif (dato==datoPaaTogreise) and tid1_før_tid2(tid, tidPaaTogreise):
+            togreiserFraStasjonEtterDato.append(row)
+
+    if len(togreiserFraStasjonEtterDato)==0:
+        print(f"Ingen togruter fra {startstasjon} til {sluttstasjon} etter {dato} {tid}")
+        return None
+
+    #Sorter listen basert på hvilken dato og klokkeslett de gyldige avgangene går. 
+    mellomListe=[]
+    for togreise in togreiserFraStasjonEtterDato:
+        datoTogreise=togreise[2]
+        tidTogreise=togreise[4]
+        #Omgjør dato og tid til datetime. 
+        mellomListe.append((togreise[0], togreise[1], togreise[2], togreise[4], datetime.strptime(datoTogreise + " " + tidTogreise, '%d.%m.%Y %H:%M')))
+
+    #Sorter basert på datetime verdien. 
+    sortertTogreiserFraStasjonEtterDato = sorted(mellomListe, key=lambda x: x[4])
+
+    togreiseIDer=[]
+    for togreise in sortertTogreiserFraStasjonEtterDato:
+        togreiseIDer.append(togreise[1])
+    con.close()
+    return togreiseIDer
+
+def finneDelstrekninger(startstasjon, sluttstasjon):
+    brukerretning = retning(startstasjon, sluttstasjon)
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute("SELECT * FROM Delstrekning")
+    rows = cursor.fetchall()
+
+    delstrekninger = []
+    if brukerretning == "med":
+        i = 3
+        for delstrekning in rows:
+            if delstrekning[i] == startstasjon:
+                delstrekninger.append(delstrekning[0])
+            elif delstrekning[i+1] == sluttstasjon:
+                delstrekninger.append(delstrekning[0])
+    else:
+        i = 4
+        for delstrekning in rows:
+            if delstrekning[i] == startstasjon:
+                delstrekninger.append(delstrekning[0])
+            elif delstrekning[i-1] == sluttstasjon:
+                delstrekninger.append(delstrekning[0])
+
+    if len(delstrekninger) > 1:
+        if delstrekninger[1] - delstrekninger[0] > 1:
+            start = delstrekninger[0] + 1
+            slutt = delstrekninger[1]
+            for i in range(start, slutt):
+                delstrekninger.append(i)
+            delstrekninger.sort()
+        
+    return delstrekninger
+
 
 
 #h)
@@ -453,7 +577,17 @@ def launch():
     
     
     elif valg == "D" or valg == "d":
-        buyTickets()
+        print("Login for å få kjøpt billetter:")
+        print("(Du må være en registrert kunde i kunderegisteret.)")
+        navn = input("Navn: ")
+        epost = input("Epost: ")
+        if validCustomer(navn, epost) == False:
+            raise Exception("Navn og epost matcher ikke med en kunde i kunderegisteret.")
+        dato = input("Hvilken dato vil du reise? ")
+        startstasjon = input("Hvor reiser du fra? ")
+        sluttstasjon = input("Hvor vil du reise til? ")
+        plass = input("Seng eller sete? ")
+        buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost)
     
     
     elif valg == "E" or valg == "E":
