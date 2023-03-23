@@ -158,16 +158,20 @@ def registrate_customer():
         kundenummer = 1
     else:
         kundenummer = len(rows) + 1
+    
+    print("Kan ikke inneholde tall.")
     navn = str(input("Navn: "))
 
     if len(navn)>40 or has_numbers(navn):
         raise Exception("Ugyldig navn.")
     
     pattern = re.compile("[^@]+@[^@]+\.[^@]+")
+    print("(Krav til epost er at det må være en @ og nøyaktig ett punktum etter @.)")
     epost = str(input("E-post: "))
     if len(epost)>50 or not pattern.match(epost):
         raise Exception("Ugyldig e-post.")
     
+    print("(Nummeret må være 8 siffer langt.)")
     tlf = str(input("Tlf nummer: "))
     if (len(tlf)!=8 or not tlf.isnumeric()):
         raise Exception("Ugyldig nummer.")
@@ -200,10 +204,11 @@ def valid_customer(navn,epost):
 #g) 
 def buy_tickets():
     print("Login for å få kjøpt billetter:")
+    print("(Du må være en registrert kunde i kunderegisteret.)")
     navn = input("Navn: ")
     epost = input("Epost: ")
     if valid_customer(navn, epost) == False:
-            raise Exception("Du har ikke registrert deg i kunderegisteret.")
+            raise Exception("Navn og epost matcher ikke med en kunde i kunderegisteret.")
     
     #få metode for å få inn alle e finne ledige billetter for en oppgitt strekning 
     #på en ønsket togrute og kjøpe de billettene hen ønsker
@@ -220,9 +225,9 @@ def buy_tickets():
         ordreNR = len(rows) + 1
     
     cursor.execute('''INSERT INTO Bestilling VALUES (?, ?)''', (kundeNR, ordreNR))
-    antallBilletter = input("Hvor mange billetter vil du kjøpe?")
+    antallBilletter = input("Hvor mange billetter vil du kjøpe? Du kan ikke kjøpe mer enn det som er ledig.")
     if antallBilletter > ledigeBilletter:
-        raise Exception("Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er ")
+        raise Exception(f"Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er {ledigeBilletter} ledige billetter igjen. ")
     bestillingsDato = date.today().strftime("%d/%m/%Y")
     feilbestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
     splittet = bestillingsDato.split("/")
@@ -248,11 +253,11 @@ def buy_tickets():
     
     if plass.lower() == "seng":
         cursor.execute('''INSERT INTO ReservertSengeplass VALUES (?, ?, ?)''', (billettID, sengNR, vognID))
-        cursor.execute('''UPDATE SengLedigPåTogReise SET ledig = FALSE WHERE sengNR = ?''', (sengNR))
+        cursor.execute('''UPDATE SengLedigPåTogReise SET ledig = False WHERE sengNR = ?''', (sengNR))
     
     else:
         cursor.execute('''INSERT INTO ReservertSeteplass VALUES (?, ?, ?)''', (billettID, seteNR, vognID))
-        cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = FALSE WHERE sengNR = ?''', (sengNR))
+        cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False WHERE sengNR = ?''', (sengNR))
 
     con.commit()
     con.close()
