@@ -357,7 +357,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass):
                                         on SeteLedigPåDelstrekning.togreiseID = Togreise.togreiseID
                                         WHERE (Togreise.dato = ? and SeteLedigPåDelstrekning.togreiseID=? and vognID=? AND seteNR=? AND delstrekningsID=? and ledig = 1)''', (dato, togreiseID, vognID[0], seteNR[0], delstrekingID))
                         ledigSete = cursor.fetchall()
-                        if ledigSete!=None:
+                        if len(ledigSete) != 0:
                             seteLedigPaaDelstrekning.append(ledigSete[0][1])
 
                     if sorted(seteLedigPaaDelstrekning)==finneDelstrekninger(startstasjon, sluttstasjon):
