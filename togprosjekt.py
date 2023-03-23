@@ -210,7 +210,7 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
     #ledigeBilletter=
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
-    cursor.execute("SELECT kundNR FROM Kunde WHERE navn = ? AND epost = ?", (navn, epost))
+    cursor.execute("SELECT kundeNR FROM Kunde WHERE navn = ? AND epost = ?", (navn, epost))
     kundeNR = cursor.fetchone()[0]
     cursor.execute("SELECT * FROM Kundeordre")
     rows = cursor.fetchall()
