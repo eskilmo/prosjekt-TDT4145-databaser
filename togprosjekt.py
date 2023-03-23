@@ -586,7 +586,13 @@ def launch():
         epost = input("Epost: ")
         if validCustomer(navn, epost) == False:
             raise Exception("Navn og epost matcher ikke med en kunde i kunderegisteret.")
+        con = sq.connect('prosjekt.db')
+        cursor = con.cursor()
+        cursor.execute("SELECT DISTINCT dato FROM Togreise")
+        rows = cursor.fetchall()
         dato = input("Hvilken dato vil du reise? ")
+        if dato not in rows:
+            raise Exception("Ingen avganger denne datoen")
         startstasjon = input("Hvor reiser du fra? ")
         sluttstasjon = input("Hvor vil du reise til? ")
         plass = input("Seng eller sete? ")
