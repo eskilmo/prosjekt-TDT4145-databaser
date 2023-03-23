@@ -202,7 +202,7 @@ def validCustomer(navn,epost):
     con.close()
     return False
 #g) 
-def buyTickets():
+def buyTickets(dato, startstasjon, sluttstasjon, plass):
     print("Login for å få kjøpt billetter:")
     print("(Du må være en registrert kunde i kunderegisteret.)")
     navn = input("Navn: ")
