@@ -96,5 +96,38 @@ def retning(startstasjon, sluttstasjon):
         return "med"
     else: 
         return "mot"
+    
+
+def finneDelstrekninger(startstasjon, sluttstasjon):
+    brukerretning = retning(startstasjon, sluttstasjon)
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute("SELECT * FROM Delstrekning")
+    rows = cursor.fetchall()
+
+    delstrekninger = []
+    if brukerretning == "med":
+        i = 3
+        for delstrekning in rows:
+            if delstrekning[i] == startstasjon:
+                delstrekninger.append(delstrekning[0])
+            elif delstrekning[i+1] == sluttstasjon:
+                delstrekninger.append(delstrekning[0])
+    else:
+        i = 4
+        for delstrekning in rows:
+            if delstrekning[i] == startstasjon:
+                delstrekninger.append(delstrekning[0])
+            elif delstrekning[i-1] == sluttstasjon:
+                delstrekninger.append(delstrekning[0])
+
+    if len(delstrekninger) > 1:
+        if delstrekninger[1] - delstrekninger[0] > 1:
+            start = delstrekninger[0] + 1
+            slutt = delstrekninger[1]
+            for i in range(start, slutt):
+                delstrekninger.append(i)
+            delstrekninger.sort()
+        
 
 print(retning("Mo i Rana", "Bodø"))
