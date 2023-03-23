@@ -543,7 +543,7 @@ def getPurchasehistory(kundeNR):
     cursor.execute('''SELECT b.billettID, o.ordreNR, o.bestillingsDato, o.bestillingsTid, b.startstasjon, b.endestasjon, b.avgangsdato, rp.seteNR, 
     rp.vognID, sp.sengNR, sp.vognID FROM Bestilling c JOIN Kundeordre o ON c.ordreNR = o.ordreNR JOIN BillettKjøp t ON o.ordreNR = t.ordreNR 
     JOIN Billett b on t.billettID = b.billettID LEFT JOIN ReservertSetePlass rp on rp.billettID = b.billettID 
-    LEFT JOIN ReservertSengeplass sp on sp.billettID = b.billettID WHERE c.kundeNR = 2''', (kundeNR))
+    LEFT JOIN ReservertSengeplass sp on sp.billettID = b.billettID WHERE c.kundeNR = 2''', (kundeNR,))
     
     rows = cursor.fetchall()
     if rows== None:
@@ -592,7 +592,7 @@ def launch():
         buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost)
     
     
-    elif valg == "E" or valg == "E":
+    elif valg == "E" or valg == "e":
         kundeNR= input("KundeNR: ")
         getPurchasehistory(kundeNR)
     
