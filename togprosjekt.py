@@ -273,7 +273,7 @@ def getPurchasehistory(kundeNR):
     
     rows = cursor.fetchall()
     if rows== None:
-        print("Du har ingen kjøp enda.")
+        raise Exception("Du har ingen kjøp enda.")
     print(f"Kjøpshistorikken til kundenummer {kundeNR} er:")
     print("ordreNR\tbetalingsdato\tbetalingsDato\tbetalingsTid\tstartstasjon\tendestasjon\tavgangsdato")
     for row in rows:
@@ -284,15 +284,41 @@ def getPurchasehistory(kundeNR):
 
 #metode som skal kjøres når fila kjøres for at brukeren får valget om hvilken handling den vil gjøre
 
-def launch():
-    print('''A Hent togruter som er innom en stasjon på en ukedag.\nB Finn togruter 
-    fra start- til sluttstasjon\nC Registrer som ny kunde\nD Finn og kjøp billetter \E Dine reiser''')
-    valg = str(input("Hvilken handling vil du gjøre?(Svar en av bokstavene over.)"))
 
-    if valg == "A" or valg == "B":
+def launch():
+    print('''\n\nA Hent togruter som er innom en stasjon på en ukedag.\nB Finn togruter fra start- til sluttstasjon\nC Registrer som ny kunde\nD Finn og kjøp billetter\nE Dine reiser\n\n''')
+    valg = str(input("(Svar en av bokstavene over.)\nHvilken handling vil du gjøre?"))
+
+    if valg == "A" or valg == "a":
         stasjon = input("Stasjon: ")
         dag = input("Dag: ")
         hentTogruterUkedagStasjon(stasjon,dag)
+    
+    elif valg == "B" or valg == "b":
+        startstasjon = input("Startstasjon: ")
+        sluttstasjon = input("Sluttstasjon: ")
+        dato = input("Dato: ")
+        tid = input("Tid: ")
+        hentTogreise(startstasjon,sluttstasjon,dato,tid)
+    
+    elif valg == "C" or valg == "c":
+        registrateCustomer()
+    
+    
+    elif valg == "D" or valg == "d":
+        buyTickets()
+    
+    
+    elif valg == "E" or valg == "E":
+        kundeNR= input("KundeNR: ")
+        getPurchasehistory(kundeNR)
+    
+    else:
+        raise Exception("Du må velge en av de oppgitte bokstavene.")
+
+launch()
+    
+
 
 
 
