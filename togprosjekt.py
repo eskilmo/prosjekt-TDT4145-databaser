@@ -590,8 +590,12 @@ def launch():
         cursor = con.cursor()
         cursor.execute("SELECT DISTINCT dato FROM Togreise")
         rows = cursor.fetchall()
+        print(rows)
         dato = input("Hvilken dato vil du reise? ")
-        if dato not in rows:
+        datoer = []
+        for row in rows:
+            datoer.append(row[0])
+        if dato not in datoer:
             raise Exception("Ingen avganger denne datoen")
         startstasjon = input("Hvor reiser du fra? ")
         sluttstasjon = input("Hvor vil du reise til? ")
