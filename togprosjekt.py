@@ -255,9 +255,11 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
                         WHERE sengNR=? and vognID=? and togreiseID=?''', (plassNR, vognID, togreiseID))
     
     elif plass.lower() == "sete":
+        delstrekningsIDer = finneDelstrekninger(startstasjon, sluttstasjon)
         cursor.execute('''INSERT INTO ReservertSeteplass VALUES (?, ?, ?)''', (billettID, plassNR, vognID))
-        cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False
-                        WHERE seteNR=? and vognID=? and togreiseID=? and delstrekningsID=?''', (plassNR, vognID, togreiseID, delstrekningsID))
+        for delstrekningsID in delstrekningsIDer:
+            cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False
+                            WHERE seteNR=? and vognID=? and togreiseID=? and delstrekningsID=?''', (plassNR, vognID, togreiseID, delstrekningsID))
 
     con.commit()
     con.close()
