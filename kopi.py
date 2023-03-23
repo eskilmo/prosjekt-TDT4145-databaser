@@ -32,27 +32,43 @@ def buy_tickets():
     #bestillingstid = 
 
     
-con = sq.connect("prosjekt.db")
-cursor = con.cursor()
+def kjop():
+    con = sq.connect("prosjekt.db")
+    cursor = con.cursor()
 
-dato = input("Hvilken dato vil du reise? ")
-startstasjon = input("Hvor reiser du fra? ")
-sluttstasjon = input("Hvor vil du reise til? ")
-plass = input("Seng eller sete? ")
+    # dato = input("Hvilken dato vil du reise? ")
+    # startstasjon = input("Hvor reiser du fra? ")
+    # sluttstasjon = input("Hvor vil du reise til? ")
+    # plass = input("Seng eller sete? ")
+    dato = "03.04.2023"
+    startstasjon = "Trondheim"
+    sluttstasjon = "Bodø"
+    plass = "seng"
 
+    if plass.lower() == "seng":
 
-if plass.lower() == "seng":
-    cursor.execute('''SELECT * 
-                    FROM SengLedigPåTogreise INNER JOIN Togreise
-                    on SengLedigPåTogreise.togreiseID = Togreise.togreiseID
-                    WHERE (Togreise.dato = ? AND ledig = 1)''', (dato,))
-    rows = cursor.fetchall()
-    print(rows)
+        ledigeSenger=[]
+        cursor.execute('''SELECT * 
+                        FROM SengLedigPåTogreise INNER JOIN Togreise
+                        on SengLedigPåTogreise.togreiseID = Togreise.togreiseID
+                        WHERE (Togreise.dato = ? AND ledig = 1)''', (dato,))
+        sengePlasser = cursor.fetchall()
 
-else:
-    cursor.execute('''SELECT * 
-                    FROM SeteLedigPåDelstrekning INNER JOIN Togreise
-                    on SeteLedigPåDelstrekning.togreiseID = Togreise.togreiseID
-                    WHERE (Togreise.dato = ? AND ledig = 1)''', (dato,))
-    rows = cursor.fetchall()
-    print(rows)
+        for i in range(0,len(sengePlasser)-1,2):
+            if sengePlasser[i][3]==1 and sengePlasser[i+1][3]:
+                ledigeSenger.append(sengePlasser[i])
+                ledigeSenger.append(sengePlasser[i+1])
+        
+        for seng in ledigeSenger:
+            print(f"Ledig sengnr {seng[2]} i kupenr {(seng[2]+1)//2} på togreise {seng[0]}")
+        # print(ledigeSenger)
+
+    else:
+        cursor.execute('''SELECT * 
+                        FROM SeteLedigPåDelstrekning INNER JOIN Togreise
+                        on SeteLedigPåDelstrekning.togreiseID = Togreise.togreiseID
+                        WHERE (Togreise.dato = ? AND ledig = 1)''', (dato,))
+        rows = cursor.fetchall()
+        print(rows)
+
+kjop()
