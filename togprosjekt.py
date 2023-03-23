@@ -144,8 +144,6 @@ def dato1_før_dato2(dato1, dato2):
         return False
     return True
 
-hentTogreise("Trondheim", "Fauske", "03.04.2023", "00:00")
-
 
 #e) En bruker skal kunne registrere seg i kunderegisteret
 
