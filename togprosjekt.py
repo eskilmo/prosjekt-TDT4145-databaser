@@ -266,6 +266,16 @@ def buyTickets():
 #h)
 
 def getPurchasehistory(kundeNR):
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute('''SELECT * FROM Kundeordre WHERE ordreNR IN (SELECT ordreNR FROM Bestilling WHERE kundeNR = ?)''', (kundeNR))
+    rows = cursor.fetchall()
+    print(f"Kjøpshistorikken til kunde nummer {kundeNR} er:")
+    for row in rows:
+        print(row)
+    con.close()
+
+
 
     
 
