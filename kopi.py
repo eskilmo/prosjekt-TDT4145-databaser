@@ -49,6 +49,7 @@ def kjop():
     if plass.lower() == "seng":
 
         ledigeSenger=[]
+        brukerretning=retning(startstasjon, sluttstasjon)
         cursor.execute('''SELECT SLPT.togreiseID, SLPT.vognID, SLPT.sengNR, SLPT.ledig, T.togruteID, T.dato, Tt.jernbanestasjonsnavn, Tt.avgangstid, Togrute.hovedretning
                 FROM SengLedigPåTogreise as SLPT INNER JOIN Togreise as T
                 on SLPT.togreiseID = T.togreiseID
@@ -80,3 +81,20 @@ def kjop():
         print(rows)
 
 kjop()
+
+
+def retning(startstasjon, sluttstasjon): 
+    con = sq.connect('prosjekt.db')
+    cursor = con.cursor()
+    cursor.execute('''SELECT stasjonNR FROM Togrutetabell
+            WHERE togruteID=1 and (jernbanestasjonsnavn=?)''', (startstasjon,))
+    startStasjonNr=int(cursor.fetchall()[0][0])
+    cursor.execute('''SELECT stasjonNR FROM Togrutetabell
+            WHERE togruteID=1 and (jernbanestasjonsnavn=?)''', (sluttstasjon,))
+    sluttStasjonNr=int(cursor.fetchall()[0][0])
+    if startStasjonNr<sluttStasjonNr:
+        return "med"
+    else: 
+        return "mot"
+
+print(retning("Mo i Rana", "Bodø"))
