@@ -226,10 +226,10 @@ def buyTickets():
     
     cursor.execute('''INSERT INTO Bestilling VALUES (?, ?)''', (kundeNR, ordreNR))
     antallBilletter = input("Hvor mange billetter vil du kjøpe? Du kan ikke kjøpe mer enn det som er ledig.")
-    if antallBilletter > ledigeBilletter:
-        raise Exception(f"Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er {ledigeBilletter} ledige billetter igjen. ")
+    #if antallBilletter > ledigeBilletter:
+    #    raise Exception(f"Det er ikke så mange billetter som er tilgjengelig på denne delstrekningen. Det er {ledigeBilletter} ledige billetter igjen. ")
     bestillingsDato = date.today().strftime("%d/%m/%Y")
-    feilbestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
+    #feilbestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
     splittet = bestillingsDato.split("/")
     bestillingsTid = ""
     for element in splittet:
@@ -256,7 +256,7 @@ def buyTickets():
         cursor.execute('''UPDATE SengLedigPåTogReise SET ledig = False 
                         WHERE sengNR=? and vognID=? and togreiseID=?''', (sengNR, vognID, togreiseID))
     
-    else:
+    elif plass.lower() == "sete":
         cursor.execute('''INSERT INTO ReservertSeteplass VALUES (?, ?, ?)''', (billettID, seteNR, vognID))
         cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False
                         WHERE seteNR=? and vognID=? and togreiseID=1 and delstrekningsID=1''', (seteNR, vognID, togreiseID, delstrekningsID))
