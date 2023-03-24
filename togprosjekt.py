@@ -119,7 +119,7 @@ def hentTogreise(startstasjon, sluttstasjon, dato, tid):
 
     con.close()
 
-#Hjelpefunksjon, sjekker om klokkeslett hh:mm er før klokkeslett hh:mm
+#Hjelpefunksjon, sjekker om klokkeslett hh:mm er før klokkeslett hh:mm (antar riktig format)
 def tid1_før_tid2(tid1, tid2):
     if tid1 == tid2:
         return True
@@ -135,7 +135,7 @@ def tid1_før_tid2(tid1, tid2):
         return False
     return True
 
-#Hjelpefunksjon, sjekker om dato1 er før dato2
+#Hjelpefunksjon, sjekker om dato1 DD.MM.YYYY er før dato2 DD.MM.YYY (antar riktig format)
 def dato1_før_dato2(dato1, dato2):
     if dato1==dato2:
         return False
