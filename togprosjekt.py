@@ -250,9 +250,13 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
 
         #Kjøres hvis bruker har valgt et gydlig sete, som 
         if (togreiseID!=None and vognID!=None and plassNR!=None):            
+            #finner bestillingstidspunktet
+            if datetime.now().minute < 10:
+                bestillingstid = str(datetime.now().hour) + ":0" + str(datetime.now().minute)  
+            else:
+                bestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
             #Finn bestillingsdato
             feilbestillingsdato = date.today().strftime("%d/%m/%Y")
-            bestillingstid = str(datetime.now().hour) + ":" + str(datetime.now().minute)
             splittet = feilbestillingsdato.split("/")
             bestillingsdato = ""
             for element in splittet:
