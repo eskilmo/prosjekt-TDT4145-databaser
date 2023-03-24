@@ -371,7 +371,11 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
 
 
         #Lar kunden velge seng og lagrer variable
-        valgtTogreise = int(input("Velg togreise: "))
+        try:
+            valgtTogreise = int(input("Velg togreise: "))
+        except ValueError:
+            return None, None, None
+
         gyldigTogreise = False
         #Viser alle ledige seter på valgt togreise
         for seng in ledigeSenger:
@@ -381,7 +385,10 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
 
         #Viser alle ledige seter på valgt togreise og vogn. 
         if gyldigTogreise:
-            valgtVogn = int(input("Velg vognNR: "))
+            try: 
+                valgtVogn = int(input("Velg vognNR: "))
+            except ValueError:
+                return None, None, None
             gyldigVogn = False
             for seng in ledigeSenger:
                 if seng[0] == valgtTogreise and seng[1] == valgtVogn:
@@ -390,7 +397,10 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
 
             #Bruker velger seng på togreise og vogn.
             if gyldigVogn:
-                valgtSeng = int(input("Velg sengNR: "))
+                try: 
+                    valgtSeng = int(input("Velg sengNR: "))
+                except ValueError:
+                    return None, None, None
                 gyldigSeng = False
                 for seng in ledigeSenger:
                     if seng[0] == valgtTogreise and seng[1] == valgtVogn and seng[2] == valgtSeng:
@@ -452,7 +462,10 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
     
         #Lar kunden velge sete og lagrer variable
         #Som i seng, velger kunden togreise, vogn, og deretter sete av de tilgjengelige setene. 
-        valgtTogreise = int(input("Velg togreise: "))
+        try: 
+            valgtTogreise = int(input("Velg togreise: "))
+        except ValueError:
+            return None, None, None
         gyldigTogreise = False
         for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
             if ledigSetePaaTogreise[0][0] == valgtTogreise:
@@ -460,7 +473,10 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                 print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
 
         if gyldigTogreise:
-            valgtVogn = int(input("Velg vognNR: "))
+            try: 
+                valgtVogn = int(input("Velg vognNR: "))
+            except ValueError:
+                return None, None, None
             gyldigVogn = False
             for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
                 if ledigSetePaaTogreise[0][0] == valgtTogreise and ledigSetePaaTogreise[0][2] == valgtVogn:
@@ -468,7 +484,10 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                     print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
 
             if gyldigVogn:
-                valgtSete = int(input("Velg seteNR: "))
+                try: 
+                    valgtSete = int(input("Velg seteNR: "))
+                except ValueError:
+                    return None, None, None
                 gyldigSete = False
                 for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
                     #Hvis bruker har gitt inn gydlig input for sete, kan det fortsettes til bestilling i buyTickets()
@@ -487,7 +506,6 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
             return None, None, None
 
         return valgtTogreise, valgtVogn, valgtSete
-    
 
 #Hjelpefunksjoner
 def retning(startstasjon, sluttstasjon): 
