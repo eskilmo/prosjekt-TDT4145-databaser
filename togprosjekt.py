@@ -634,8 +634,8 @@ def launch():
     elif valg == "B" or valg == "b":
         startstasjon = input("Startstasjon: ")
         sluttstasjon = input("Sluttstasjon: ")
-        dato = input("Dato: ")
-        tid = input("Tid: ")
+        dato = input("Dato: (på format DD.MM.YYYY)")
+        tid = input("Tid: (på format HH:MM)")
         hentTogreise(startstasjon,sluttstasjon,dato,tid)
     
     elif valg == "C" or valg == "c":
