@@ -8,21 +8,27 @@ def hentTogruterUkedagStasjon(stasjon, ukedag):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
     cursor.execute('''SELECT * FROM
-        (SELECT ruteID, startstasjon, endestasjon, hovedretning, operatør FROM
-        (SELECT togruteID
+        (SELECT ruteID, startstasjon, endestasjon, hovedretning, operatør, ankomsttid, avgangstid FROM
+        (SELECT togruteID, ankomsttid, avgangstid
         FROM Togrutetabell
         WHERE jernbanestasjonsnavn=?)
         INNER JOIN Togrute ON togruteID=ruteID)
         NATURAL JOIN Avgangsdager
         WHERE dag=?''', (stasjon, ukedag))
     rows = cursor.fetchall()
+
     if len(rows)==0:
         print(f"Det er ingen togruter som går gjennom {stasjon} på {ukedag}.")
-    else:
+    else: 
         print(f"Togruter som går innom {stasjon} på {ukedag}:")
         for row in rows:
-            print(f'RuteID: {row[0]} fra {row[1]} til {row[2]}')
-    con.close()
+            #Hvis ankomsttid er NULL, bruk avgangstid:
+            if row[5]==None: 
+                print(f'RuteID: {row[0]} fra {row[1]} til {row[2]} kl {row[6]}')
+            #Hvis avgangstid er NULL, bruk ankomsttid:
+            else:
+                print(f'RuteID: {row[0]} fra {row[1]} til {row[2]} kl {row[5]}')
+        con.close()
 
 #hentTogruterUkedagStasjon("Bodø", "mandag")
 
