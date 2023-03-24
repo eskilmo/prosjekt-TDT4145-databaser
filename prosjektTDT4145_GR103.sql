@@ -1,3 +1,5 @@
+--Oppretter databasen med tomme tabeller
+
 CREATE table Jernbanestasjon (
     navn VARCHAR(40) NOT NULL,
     moh FLOAT,

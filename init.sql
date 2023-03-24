@@ -1,3 +1,5 @@
+--Setter inn verdier for Nordlandsbanen inn i den tomme databasen
+
 INSERT INTO Jernbanestasjon (navn, moh) VALUES ("Trondheim", 5.1);
 INSERT INTO Jernbanestasjon (navn, moh) VALUES ("Steinkjer", 3.6);
 INSERT INTO Jernbanestasjon (navn, moh) VALUES ("Mosjøen", 6.8);
