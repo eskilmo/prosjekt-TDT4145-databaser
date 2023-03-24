@@ -7,6 +7,8 @@ from datetime import date, datetime
 def hentTogruterUkedagStasjon(stasjon, ukedag):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
+    #Spørring for å hente ut ruteID, startstasjon, sluttstasjon, tid mm. fra tog som går innom 
+    #gitt stasjon på gitt ukedag. 
     cursor.execute('''SELECT * FROM
         (SELECT ruteID, startstasjon, endestasjon, hovedretning, operatør, ankomsttid, avgangstid FROM
         (SELECT togruteID, ankomsttid, avgangstid
@@ -211,14 +213,14 @@ def validCustomer(navn,epost):
     return False
 #g) 
 def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
-    
-    #få metode for å få inn alle e finne ledige billetter for en oppgitt strekning 
-    #på en ønsket togrute og kjøpe de billettene hen ønsker
 
+    #Henter ut kunde med navn og epost 
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
     cursor.execute("SELECT kundeNR FROM Kunde WHERE navn = ? AND epost = ?", (navn, epost))
     kundeNR = cursor.fetchone()[0]
+
+    #Oppretter nytt ordrenummer
     cursor.execute("SELECT * FROM Bestilling")
     rows = cursor.fetchall()
     if rows == None:
@@ -229,7 +231,9 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
     antallBilletter=0
 
     first=True
+    #Kan bestille så mange ledige billetter kunde vil i samme ordre. 
     while True:
+        #Setter togreiseID, vognID, plassNR til det bruker velger etter 
         togreiseID, vognID, plassNR = kjop(dato, startstasjon, sluttstasjon, plass, ordreNR)
         
         #Hvis bruker har valgt gyldig ledig plass for første gang, så lager en bestilling/kundeordre.
@@ -237,6 +241,7 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
             cursor.execute('''INSERT INTO Bestilling VALUES (?, ?)''', (kundeNR, ordreNR))
             first=False
 
+        #Kjøres hvis bruker har valgt et gydlig sete, som 
         if (togreiseID!=None and vognID!=None and plassNR!=None):            
             #Finn bestillingsdato
             feilbestillingsdato = date.today().strftime("%d/%m/%Y")
@@ -291,6 +296,9 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
             break
     con.close()
 
+#Funksjon til g) som finner ledige seter/senger mellom start og slutt på gitt dato. 
+#Returener <None, None, None> dersom noe av input er feil. 
+#Returener <valgtTogreise, valgtVogn, valgtSete> dersom bruker har valgt et gyldig ledig sete. 
 def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
     con = sq.connect("prosjekt.db")
     cursor = con.cursor()
@@ -319,16 +327,12 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                             INNER JOIN Vognoppsett as V on RS.vognID = V.vognID
                             INNER JOIN Togreise as T on V.ruteID = T.togruteID
                             WHERE T.dato=? and RS.sengNr=? and RS.vognID=? and T.togreiseID=?''', (sengePlasser[i][5], sengePlasser[i][2], sengePlasser[i][1], sengePlasser[i][0]))
-            ordreSeng=cursor.fetchall()
-            # print(ordreSeng, ordreNummer)
-            print(sengePlasser[i])
-            print(sengePlasser[i+1])
+            ordreSeng=cursor.fetchall()            
 
             #Sjekker om sengen har et ordrenummer knyttet til seg, og om det er samme som i nåværende ordre.
             #Hvis det er nåværende ordre kan begge senger i kupeen bestilles. 
             if (len(ordreSeng)!=0):
                 if (ordreNummer==ordreSeng[0][2]):
-                    print("LIIIIIK")
                     if (sengePlasser[i][2]%2==1):
                         if sengePlasser[i+1][3]==1:
                             ledigeSenger.append(sengePlasser[i+1])
