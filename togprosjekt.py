@@ -268,7 +268,7 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
                 for delstrekningsID in delstrekningsIDer:
                     cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False
                                     WHERE seteNR=? and vognID=? and togreiseID=? and delstrekningsID=?''', (plassNR, vognID, togreiseID, delstrekningsID))
-
+#flytter commit()
             con.commit()
             antallBilletter+=1
 
@@ -280,11 +280,10 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
             if antallBilletter>0:
                 print(f"Du kjøpte {antallBilletter} billetter med ordrenummer {ordreNR}")
                 cursor.execute('''INSERT INTO Kundeordre VALUES (?, ?, ?, ?)''', (antallBilletter, ordreNR, bestillingsdato, bestillingstid))
+                con.commit()
             else: 
                 print("Ingen billetter kjøpt, avbryter ordre.")
             break
-
-
     con.close()
 
 def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
