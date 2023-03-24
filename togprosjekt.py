@@ -694,6 +694,9 @@ def launch():
             raise Exception("Ingen avganger denne datoen")
         startstasjon = input("Hvor reiser du fra? ")
         sluttstasjon = input("Hvor vil du reise til? ")
+        #Sjekker om det er noen togreiser som går fra start til slutt på gitt dato.
+        if not hentTogreiseIDer(startstasjon, sluttstasjon, dato, "00:00"):
+            raise Exception("Ingen tog går mellom disse stasjonene på gitt dato")
         plass = input("Seng eller sete? ")
         buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost)
     
