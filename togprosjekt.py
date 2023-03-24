@@ -157,10 +157,11 @@ def dato1_før_dato2(dato1, dato2):
 
 
 #e) En bruker skal kunne registrere seg i kunderegisteret
-
 def registrateCustomer():
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
+
+    #Oppretter nytt kundenummer
     cursor.execute("SELECT * FROM Kunde")
     rows = cursor.fetchall()
     if rows == None:
@@ -171,25 +172,30 @@ def registrateCustomer():
     print("Kan ikke inneholde tall.")
     navn = str(input("Navn: "))
 
+    #Sjekk gyldig navn
     if len(navn)>40 or hasNumbers(navn):
         raise Exception("Ugyldig navn.")
     
+    #Sjekk gyldig epost
     pattern = re.compile("[^@]+@[^@]+\.[^@]+")
     print("(Krav til epost er at det må være en @ og nøyaktig ett punktum etter @.)")
     epost = str(input("E-post: "))
     if len(epost)>50 or not pattern.match(epost):
         raise Exception("Ugyldig e-post.")
     
+    #Sjekk gyldig nummer
     print("(Nummeret må være 8 siffer langt.)")
     tlf = str(input("Tlf nummer: "))
     if (len(tlf)!=8 or not tlf.isnumeric()):
         raise Exception("Ugyldig nummer.")
     
+    #Sjekk at det registreres en ny kunde med unikt epost og tlfnr
     cursor.execute("SELECT * FROM Kunde WHERE mobilNR = ? OR epost = ?", (tlf, epost))
     duplicates = cursor.fetchall()
     if duplicates != []:
         raise Exception("Tlf eller epost er allerede registrert i kunderegisteret.")
     
+    #Legg kunde inn i kunderegister dersom alt er gyldig 
     cursor.execute("INSERT INTO Kunde (kundeNR, mobilNR, epost, navn) VALUES ( ?, ?, ?, ?)", (kundenummer, tlf, epost, navn))
     print(f"Kundenummeret ditt er: {kundenummer}")
     con.commit()
@@ -211,6 +217,7 @@ def validCustomer(navn,epost):
             return True
     con.close()
     return False
+
 #g) 
 def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
 
@@ -233,7 +240,7 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
     first=True
     #Kan bestille så mange ledige billetter kunde vil i samme ordre. 
     while True:
-        #Setter togreiseID, vognID, plassNR til det bruker velger etter 
+        #Setter togreiseID, vognID, plassNR til det bruker velger. Settes None, None, None dersom ugyldig input. 
         togreiseID, vognID, plassNR = kjop(dato, startstasjon, sluttstasjon, plass, ordreNR)
         
         #Hvis bruker har valgt gyldig ledig plass for første gang, så lager en bestilling/kundeordre.
@@ -266,13 +273,13 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
             cursor.execute('''INSERT INTO Billett VALUES (?, ?, ?, ?)''', (billettID, startstasjon, sluttstasjon, dato))
             cursor.execute('''INSERT INTO BillettKjøp VALUES (?, ?)''', (billettID, ordreNR))
 
-            #Når billettkjøpet har blitt registrert må de aktuelle setene/sengene bli gjort om til 
-            #å ikke være ledig lengre 
+            #Når billettkjøpet har blitt registrert må de aktuelle sengene gjøres opptatt på hele togreisen. 
             if plass.lower() == "seng":
                 cursor.execute('''INSERT INTO ReservertSengeplass VALUES (?, ?, ?)''', (billettID, plassNR, vognID))
                 cursor.execute('''UPDATE SengLedigPåTogReise SET ledig = False 
                                 WHERE sengNR=? and vognID=? and togreiseID=?''', (plassNR, vognID, togreiseID))
             
+            #Når billettkjøpet har blitt registrert må de aktuelle setene bli gjort opptatt på aktuelle delstrekninger på togreisen. 
             elif plass.lower() == "sete":
                 delstrekningsIDer = finneDelstrekninger(startstasjon, sluttstasjon)
                 cursor.execute('''INSERT INTO ReservertSeteplass VALUES (?, ?, ?)''', (billettID, plassNR, vognID))
@@ -282,10 +289,12 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
             con.commit()
             antallBilletter+=1
 
+        #Hvis bruker har valgt ugyldig input fra kjop(): 
         else:
             print("Ugyldig input")
 
         nybillett=input("Kjøpe ny billett i ordre? (y/n)")
+        #Hvis bruker ikke vil kjøpe flere billetter, legg til ordre: 
         if (nybillett=="n"):
             if antallBilletter>0:
                 print(f"Du kjøpte {antallBilletter} billetter med ordrenummer {ordreNR}")
@@ -347,7 +356,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                     ledigeSenger.append(sengePlasser[i])
                     ledigeSenger.append(sengePlasser[i+1])
             
-        
+        #Printer ut ledige senger
         if len(ledigeSenger)==0:
             print(f"Ingen ledige senger fra {startstasjon} {dato}")
             return None, None, None
@@ -360,11 +369,13 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
         #Lar kunden velge seng og lagrer variable
         valgtTogreise = int(input("Velg togreise: "))
         gyldigTogreise = False
+        #Viser alle ledige seter på valgt togreise
         for seng in ledigeSenger:
             if seng[0] == valgtTogreise:
                 gyldigTogreise = True
                 print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} i vogn nummer {seng[1]} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
 
+        #Viser alle ledige seter på valgt togreise og vogn. 
         if gyldigTogreise:
             valgtVogn = int(input("Velg vognNR: "))
             gyldigVogn = False
@@ -373,6 +384,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                     gyldigVogn = True
                     print(f"Sengnummer {seng[2]} i kupenummer {(seng[2]+1)//2} i vogn nummer {seng[1]} på togreise {seng[0]} fra {seng[6]} {dato} {seng[7]}")
 
+            #Bruker velger seng på togreise og vogn.
             if gyldigVogn:
                 valgtSeng = int(input("Velg sengNR: "))
                 gyldigSeng = False
@@ -396,6 +408,8 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
     #Finner ledige sitteplasser  
     elif plass.lower() == "sete":
         ledigeSeterPaaValgtTogreise=[]
+        #Henter togreiseIDer som kan kjøre mellom start og slutt etter gitt dato (velger kun spesifikk dato senere). 
+        #Henter deretter vognID gitt togreiseID. 
         for togreiseID in hentTogreiseIDer(startstasjon, sluttstasjon, dato, "00:00"):
             cursor.execute('''SELECT DISTINCT vognID
                             FROM SeteIVogn NATURAL JOIN Vognoppsett
@@ -403,6 +417,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                             WHERE (togreiseID=?) and dato=?''', (togreiseID, dato))
             vognIDer = cursor.fetchall()
 
+            #Henter seter etter på alle vognene. 
             for vognID in vognIDer:
                 cursor.execute('''SELECT DISTINCT seteNR
                                 FROM SeteIVogn NATURAL JOIN Vognoppsett
@@ -410,6 +425,8 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                                 WHERE (togreiseID=?) and dato=? and vognID=?''', (togreiseID, dato, vognID[0]))
                 seteIDer = cursor.fetchall()
 
+                #Går gjennom alle setene og sjekker om de er ledige på alle av delstrekningene på togreisen. 
+                #Dersom de er ledige legges de til i listen over ledige seter som kan velges. 
                 for seteNR in seteIDer:
                     seteLedigPaaDelstrekning=[]
 
@@ -425,10 +442,12 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                     if sorted(seteLedigPaaDelstrekning)==finneDelstrekninger(startstasjon, sluttstasjon):
                         ledigeSeterPaaValgtTogreise.append(ledigSete)
         
+        #Printer ut ledige seter. 
         for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
             print(f"Ledig sete nr {ledigSetePaaTogreise[0][3]} i vogn {ledigSetePaaTogreise[0][2]} på togreise {ledigSetePaaTogreise[0][0]}")
     
         #Lar kunden velge sete og lagrer variable
+        #Som i seng, velger kunden togreise, vogn, og deretter sete av de tilgjengelige setene. 
         valgtTogreise = int(input("Velg togreise: "))
         gyldigTogreise = False
         for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
@@ -448,6 +467,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                 valgtSete = int(input("Velg seteNR: "))
                 gyldigSete = False
                 for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
+                    #Hvis bruker har gitt inn gydlig input for sete, kan det fortsettes til bestilling i buyTickets()
                     if ledigSetePaaTogreise[0][0] == valgtTogreise and ledigSetePaaTogreise[0][2] == valgtVogn and ledigSetePaaTogreise[0][3] == valgtSete:
                         gyldigSete = True
                         print(f"Du har kjøpt seteNR {valgtSete} i vogn {valgtVogn} på togreise {valgtTogreise}")
@@ -466,7 +486,6 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
     
 
 #Hjelpefunksjoner
-
 def retning(startstasjon, sluttstasjon): 
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
@@ -481,6 +500,8 @@ def retning(startstasjon, sluttstasjon):
     else: 
         return "mot"
 
+#Hjelpefunksjon for å hente ut gyldige togreiseID mellom start og slutt på gitt dato og tid. 
+#Stort sett kopiert fra oppg d) men returnerer en liste. 
 def hentTogreiseIDer(startstasjon, sluttstasjon, dato, tid):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
@@ -565,6 +586,7 @@ def hentTogreiseIDer(startstasjon, sluttstasjon, dato, tid):
     con.close()
     return togreiseIDer
 
+#Hjelpefunksjon. Finner og returnerer en liste med alle delstrekingene mellom start- og sluttstasjon. 
 def finneDelstrekninger(startstasjon, sluttstasjon):
     brukerretning = retning(startstasjon, sluttstasjon)
     con = sq.connect('prosjekt.db')
@@ -599,42 +621,45 @@ def finneDelstrekninger(startstasjon, sluttstasjon):
     return delstrekninger
 
 
-
 #h)
-
 def getPurchasehistory(kundeNR):
     con = sq.connect('prosjekt.db')
     cursor = con.cursor()
+
+    #Finner alle billetter med kundeordre til en kunde med bestillingsdato og bestillingstid. 
     cursor.execute('''SELECT b.billettID, o.ordreNR, o.bestillingsDato, o.bestillingsTid, b.startstasjon, b.endestasjon, b.avgangsdato, rp.seteNR, 
     rp.vognID, sp.sengNR, sp.vognID FROM Bestilling c JOIN Kundeordre o ON c.ordreNR = o.ordreNR JOIN BillettKjøp t ON o.ordreNR = t.ordreNR 
     JOIN Billett b on t.billettID = b.billettID LEFT JOIN ReservertSetePlass rp on rp.billettID = b.billettID 
     LEFT JOIN ReservertSengeplass sp on sp.billettID = b.billettID WHERE c.kundeNR = ?''', (kundeNR,))
     
     rows = cursor.fetchall()
-    if rows== None:
+    #Hvis ingen kjøp av kunde:
+    if len(rows)==0:
         raise Exception("Du har ingen kjøp enda.")
     print(f"Kjøpshistorikken til kundenummer {kundeNR} er:\n")
     for row in rows:
+        #Hvis bestilling er sete:
         if row[7] != None:
             print(f'BilettID: {row[0]} | OrdreNR: {row[1]} | Bestillingsdato: {row[2]} | Bestillingstid: {row[3]}\nStartstasjon: {row[4]} | Endestasjon: {row[5]} | Avgangsdato: {row[6]} | SeteNr: {row[7]} | VognID: {row[8]}')
+        #Hvis bestilling er sete:
         else:
             print(f'BilettID: {row[0]} | OrdreNR: {row[1]} | Bestillingsdato: {row[2]} | Bestillingstid: {row[3]}\nStartstasjon: {row[4]} | Endestasjon: {row[5]} | Avgangsdato: {row[6]} | SengNr: {row[9]} | VognID: {row[10]}')
         print('\n')
     con.close()
-#mangler å få inn vognnr, setenr etc
 
 
-
-#metode som skal kjøres når fila kjøres for at brukeren får valget om hvilken handling den vil gjøre
+#Metode som skal kjøres når fila kjøres for at brukeren får valget om hvilken handling den vil gjøre
 def launch():
     print('''\n\nA Hent togruter som er innom en stasjon på en ukedag.\nB Finn togruter fra start- til sluttstasjon\nC Registrer som ny kunde\nD Finn og kjøp billetter\nE Dine reiser\n\n''')
     valg = str(input("(Svar en av bokstavene over.)\nHvilken handling vil du gjøre?"))
 
+    #oppg c)
     if valg == "A" or valg == "a":
         stasjon = input("Stasjon: ")
         dag = input("Dag: ").lower()
         hentTogruterUkedagStasjon(stasjon,dag)
     
+    #oopg d)
     elif valg == "B" or valg == "b":
         startstasjon = input("Startstasjon: ")
         sluttstasjon = input("Sluttstasjon: ")
@@ -642,15 +667,17 @@ def launch():
         tid = input("Tid (på format HH:MM): ")
         hentTogreise(startstasjon,sluttstasjon,dato,tid)
     
+    #oppg e)
     elif valg == "C" or valg == "c":
         registrateCustomer()
     
-    
+    #oppg g)
     elif valg == "D" or valg == "d":
         print("Login for å få kjøpt billetter:")
         print("(Du må være en registrert kunde i kunderegisteret.)")
         navn = input("Navn: ")
         epost = input("Epost: ")
+        #Sjekker at kunden er registrert i kunderegister før kjøp av billetter. 
         if validCustomer(navn, epost) == False:
             raise Exception("Navn og epost matcher ikke med en kunde i kunderegisteret.")
         con = sq.connect('prosjekt.db')
@@ -659,6 +686,7 @@ def launch():
         rows = cursor.fetchall()
         print("Dato må skrives på format: DD.MM.YYYY")
         dato = input("Hvilken dato vil du reise? ")
+        #Sjekker at det er noen avganger som går på valgt dato. 
         datoer = []
         for row in rows:
             datoer.append(row[0])
@@ -669,7 +697,7 @@ def launch():
         plass = input("Seng eller sete? ")
         buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost)
     
-    
+    #opp h)
     elif valg == "E" or valg == "e":
         kundeNR= int(input("KundeNR: "))
         getPurchasehistory(kundeNR)
