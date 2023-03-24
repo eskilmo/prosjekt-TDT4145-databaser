@@ -669,6 +669,35 @@ def getPurchasehistory(kundeNR):
         print('\n')
     con.close()
 
+#Hjelpefunksjon for sjekk om dato på gyldig format
+def sjekkDatoFormat(dato):
+    datoSplit=dato.split(".")
+    if (len(datoSplit[0])!=2 or len(datoSplit[1])!=2 or len(datoSplit[2])!=4):
+        return False
+    d=int(datoSplit[0])
+    m=int(datoSplit[1])
+    y=int(datoSplit[2])
+    if (d>31 or d<1):
+        return False
+    if (m>12 or m<1):
+        return False
+    if (y<2023):
+        return False
+    return True
+
+#Hjelpefunksjon for sjekk om klokkeslett på gyldig format
+def sjekkTidFormat(tid):
+    tidSplit=tid.split(":")
+    if (len(tidSplit[0])!=2 or len(tidSplit[1])!=2):
+        return False
+    h=int(tidSplit[0])
+    m=int(tidSplit[1])
+
+    if (h>23 or h<0):
+        return False
+    if (m>59 or m<0):
+        return False
+    return True
 
 #Metode som skal kjøres når fila kjøres for at brukeren får valget om hvilken handling den vil gjøre
 def launch():
@@ -687,6 +716,23 @@ def launch():
         sluttstasjon = input("Sluttstasjon: ")
         dato = input("Dato (på format DD.MM.YYYY): ")
         tid = input("Tid (på format HH:MM): ")
+
+        #Sjekk dato på gyldig format
+        try: 
+            if not sjekkDatoFormat(dato):
+                raise Exception("Dato på feil format")
+        except Exception:
+            raise Exception("Dato på feil format")
+        
+        #Sjekk klokkeslett på gyldig format
+        try: 
+            if not sjekkTidFormat(tid):
+                raise Exception("Tid på feil format")
+
+        except Exception:
+            raise Exception("Tid på feil format")
+
+
         hentTogreise(startstasjon,sluttstasjon,dato,tid)
     
     #oppg e)
