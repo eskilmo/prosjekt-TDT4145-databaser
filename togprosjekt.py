@@ -278,7 +278,7 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
             antallBilletter+=1
 
         else:
-            print("FEIL")
+            print("Ugyldig input")
 
         nybillett=input("Kjøpe ny billett i ordre? (y/n)")
         if (nybillett=="n"):
@@ -375,7 +375,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                 for seng in ledigeSenger:
                     if seng[0] == valgtTogreise and seng[1] == valgtVogn and seng[2] == valgtSeng:
                         gyldigSeng = True
-                        print("HURRA!")
+                        print(f"Du har kjøpt sengNR {valgtSeng} i vogn {valgtVogn} på togreise {valgtTogreise}")
                 if not(gyldigSeng):
                     print("Ikke gyldig sengNR")
                     return None, None, None
@@ -446,7 +446,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass, ordreNummer):
                 for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
                     if ledigSetePaaTogreise[0][0] == valgtTogreise and ledigSetePaaTogreise[0][2] == valgtVogn and ledigSetePaaTogreise[0][3] == valgtSete:
                         gyldigSete = True
-                        print("HURRA!")
+                        print(f"Du har kjøpt seteNR {valgtSete} i vogn {valgtVogn} på togreise {valgtTogreise}")
                 if not(gyldigSete):
                     print("Ikke gyldig seteNR")
                     return None, None, None
@@ -653,6 +653,7 @@ def launch():
         cursor = con.cursor()
         cursor.execute("SELECT DISTINCT dato FROM Togreise")
         rows = cursor.fetchall()
+        print("Dato må skrives på format: DD.MM.YYYY")
         dato = input("Hvilken dato vil du reise? ")
         datoer = []
         for row in rows:
