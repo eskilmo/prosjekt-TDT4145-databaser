@@ -268,7 +268,6 @@ def buyTickets(dato, startstasjon, sluttstasjon, plass, navn, epost):
                 for delstrekningsID in delstrekningsIDer:
                     cursor.execute('''UPDATE SeteLedigPåDelstrekning SET ledig = False
                                     WHERE seteNR=? and vognID=? and togreiseID=? and delstrekningsID=?''', (plassNR, vognID, togreiseID, delstrekningsID))
-#flytter commit()
             con.commit()
             antallBilletter+=1
 
