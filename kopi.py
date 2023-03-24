@@ -93,7 +93,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass):
                 for seng in ledigeSenger:
                     if seng[0] == valgtTogreise and seng[1] == valgtVogn and seng[2] == valgtSeng:
                         gyldigSeng = True
-                        print("HURRA!")
+                        print(f"Du har kjøpt sengNR {valgtSeng} i vogn {valgtVogn} på togreise {valgtTogreise}")
                 if not(gyldigSeng):
                     print("Ikke gyldig sengNR")
 
@@ -158,7 +158,7 @@ def kjop(dato, startstasjon, sluttstasjon, plass):
             for ledigSetePaaTogreise in ledigeSeterPaaValgtTogreise:
                 if ledigSetePaaTogreise[0][0] == valgtTogreise and ledigSetePaaTogreise[0][2] == valgtVogn and ledigSetePaaTogreise[0][3] == valgtSete:
                     gyldigSete = True
-                    print("HURRA!")
+                    print(f"Du har kjøpt seteNR {valgtSete} i vogn {valgtVogn} på togreise {valgtTogreise}")
             if not(gyldigSete):
                 print("Ikke gyldig seteNR")
                 

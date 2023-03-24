@@ -2,6 +2,7 @@
 
 #togreiseID
 for i in range(2, 6, 3):
+    #seteNR
     for j in range(1, 9):
         print(f'''INSERT INTO SengLedigPåTogreise (togreiseID, vognID, sengNR, ledig) VALUES ({i}, {2}, {j}, {True});''')
     
