@@ -718,7 +718,7 @@ def launch():
         tid = input("Tid (på format HH:MM): ")
 
         #Sjekk dato på gyldig format
-        try: 
+        try:
             if not sjekkDatoFormat(dato):
                 raise Exception("Dato på feil format")
         except Exception:
