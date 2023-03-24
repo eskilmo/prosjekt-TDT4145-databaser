@@ -16,9 +16,12 @@ def hentTogruterUkedagStasjon(stasjon, ukedag):
         NATURAL JOIN Avgangsdager
         WHERE dag=?''', (stasjon, ukedag))
     rows = cursor.fetchall()
-    print(f"Togruter som går innom {stasjon} på {ukedag}:")
-    for row in rows:
-        print(f'RuteID: {row[0]} fra {row[1]} til {row[2]}')
+    if len(rows)==0:
+        print(f"Det er ingen togruter som går gjennom {stasjon} på {ukedag}.")
+    else:
+        print(f"Togruter som går innom {stasjon} på {ukedag}:")
+        for row in rows:
+            print(f'RuteID: {row[0]} fra {row[1]} til {row[2]}')
     con.close()
 
 #hentTogruterUkedagStasjon("Bodø", "mandag")
@@ -659,14 +662,13 @@ def launch():
     
     
     elif valg == "E" or valg == "e":
-        kundeNR= input("KundeNR: ")
+        kundeNR= int(input("KundeNR: "))
         getPurchasehistory(kundeNR)
     
     else:
         raise Exception("Du må velge en av de oppgitte bokstavene.")
 
 launch()
-    
 
 
 
